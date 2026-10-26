@@ -13,30 +13,34 @@
   ],
   "author": "Noodlestan Collective",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noodlestan/art-works.git",
+    "directory": "cli/workspace"
+  },
   "private": false,
   "publishConfig": {
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/noodlestan/art-works",
-    "directory": "cli/workspace"
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE-MIT",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
   },
   "type": "module",
-  "bin": {
-    "art-workspace-cli": "./dist/index.mjs"
-  },
   "exports": {
     "./config": {
       "types": "./dist/config/index.d.ts",
       "import": "./dist/config/index.mjs"
     }
   },
-  "files": [
-    "dist",
-    "LICENSE-MIT",
-    "README.md"
-  ],
+  "bin": {
+    "art-workspace-cli": "./dist/index.mjs"
+  },
   "scripts": {
     "dev": "esbuild-cli-watch",
     "lint": "prettier . -c && eslint . && tsc --noEmit",
@@ -49,10 +53,10 @@
     "ci": "npm run lint && npm run build && npm run test:unit && npm run test:integration"
   },
   "dependencies": {
-    "@art-lib/fs-records": "0.0.2",
+    "@art-lib/fs-records": "0.0.3",
     "commander": "12.0.0",
-    "esbuild": "0.28.0",
-    "simple-git": "3.36.0"
+    "esbuild": "0.28.2",
+    "simple-git": "4.0.2"
   },
   "devDependencies": {}
 }

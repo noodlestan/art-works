@@ -6,7 +6,7 @@
 
 **Purpose:** Generic record read/write modules for Art MD record files.
 
-**Version:** `^0.0.1`
+**Version:** `0.0.2`
 
 ## Package Dependency: Commander
 
@@ -14,7 +14,7 @@
 
 **Purpose:** CLI framework for argument parsing and command routing.
 
-**Version:** `^12.0.0`
+**Version:** `12.0.0`
 
 ## Package Dependency: Simple Git
 
@@ -22,7 +22,7 @@
 
 **Purpose:** Git operations library for status, push, clone, branch commands.
 
-**Version:** `^3.24.0`
+**Version:** `3.36.0`
 
 ## Package Dependency: ESBuild
 
@@ -30,7 +30,7 @@
 
 **Purpose:** Workspace configs are expressed in `.mts` modules and need to be compiled by CLI.
 
-**Version:** `^0.28.0`
+**Version:** `0.28.0`
 
 ## Package: Art Workspace Cli
 
@@ -67,14 +67,15 @@
 **Files:**
 
 - `dist`
-- `LICENSE-MIT`
 - `README.md`
+- `LICENSE-MIT`
+- `CHANGELOG.md`
 
 **Language:** TypeScript
 
 **Bin:**
 
-- `art-workspace-cli`: `./dist/index.js`
+- `art-workspace-cli`: `./dist/index.mjs`
 
 **Engines:**
 

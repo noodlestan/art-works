@@ -1,14 +1,7 @@
 import type { Checkout } from '../store/createCheckout.js';
 
 export type CheckoutOp =
-	| 'clone'
-	| 'push'
-	| 'pull'
-	| 'publish'
-	| 'branch'
-	| 'linked'
-	| 'unlink'
-	| 'run';
+	'clone' | 'push' | 'pull' | 'publish' | 'branch' | 'linked' | 'unlink' | 'run';
 
 export type OperationOutcome = 'pending' | 'success' | 'failure';
 

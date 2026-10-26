@@ -10,23 +10,23 @@
 
 ### Changes
 
-| Goal                                                | Instruciones                                                                                                              | Outcome                                                                                                                |
+| Goal | Instruciones | Outcome |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------- |
 | Add pending outcome and per-operation pending types | Step 1 / 6 — Add pending outcome and pending operation types; Step 2 / 6 — Reorder types and extend the `Operation` union | `pending` outcome added; `OperationPending` and 7 per-operation pending types added; types reordered by kind (`Pending | Success | Failure`) matching the `Operation` union order; union extended with all three outcomes per kind |
-| Rename `branch created` to `branch`                 | Step 4 / 6 — Rename in code and tests; Step 5 / 6 — Mirror in architecture docs                                           | `branch created` renamed to `branch` in operation types, factories, tests, and architecture docs                       |
-| Commit and push                                     | Step 3 / 6 and Step 6 / 6                                                                                                 | 2 commits created and pushed                                                                                           |
+| Rename `branch created` to `branch` | Step 4 / 6 — Rename in code and tests; Step 5 / 6 — Mirror in architecture docs | `branch created` renamed to `branch` in operation types, factories, tests, and architecture docs |
+| Commit and push | Step 3 / 6 and Step 6 / 6 | 2 commits created and pushed |
 
 #### Files changed
 
-| File                                                     | Change                                                                                                                                                                                                                    |
+| File | Change |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
-| `src/private/operations/types.ts`                        | Added `pending` outcome, `OperationPending`, and per-kind pending types (`ClonePending`, `PushPending`, `PullPending`, `PublishPending`, `BranchPending`, `LinkedPending`, `UnlinkPending`); reordered groups to `Pending | Success | Failure`; extended the `Operation`union. Renamed`branch created`operation to`branch`. |
-| `src/private/commands/operations/createBranchSuccess.ts` | Renamed `operation` value from `branch created` to `branch`.                                                                                                                                                              |
-| `src/private/commands/operations/createBranchFailure.ts` | Renamed `operation` value from `branch created` to `branch`.                                                                                                                                                              |
-| `src/commands/branch/runBranch.test.ts`                  | Updated three `branch created` assertions to `branch`.                                                                                                                                                                    |
-| `architecture/_pseudo.md`                                | Operation kinds list: `branch created` → `branch`.                                                                                                                                                                        |
-| `architecture/commands.md`                               | Branch command procedure and BDD scenarios: `branch created` → `branch`.                                                                                                                                                  |
-| `architecture/index.md`                                  | OperationsLog operation list: `branch created` → `branch`.                                                                                                                                                                |
+| `src/private/operations/types.ts` | Added `pending` outcome, `OperationPending`, and per-kind pending types (`ClonePending`, `PushPending`, `PullPending`, `PublishPending`, `BranchPending`, `LinkedPending`, `UnlinkPending`); reordered groups to `Pending | Success | Failure`; extended the `Operation`union. Renamed`branch created`operation to`branch`. |
+| `src/private/commands/operations/createBranchSuccess.ts` | Renamed `operation` value from `branch created` to `branch`. |
+| `src/private/commands/operations/createBranchFailure.ts` | Renamed `operation` value from `branch created` to `branch`. |
+| `src/commands/branch/runBranch.test.ts` | Updated three `branch created` assertions to `branch`. |
+| `architecture/_pseudo.md` | Operation kinds list: `branch created` → `branch`. |
+| `architecture/commands.md` | Branch command procedure and BDD scenarios: `branch created` → `branch`. |
+| `architecture/index.md` | OperationsLog operation list: `branch created` → `branch`. |
 
 Note: `architecture/operations-log.md` is read-only and was NOT modified; per instructions, the rename there (still references `branch created`) is flagged for the delegator/planner to resolve separately.
 
