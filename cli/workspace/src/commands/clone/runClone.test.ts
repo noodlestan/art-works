@@ -44,8 +44,8 @@ describe('clone command', () => {
 		const recordFile = join(workspaceDir, '_records/artificial-checkout.art');
 		const content = readFileSync(recordFile, 'utf-8');
 		expect(content).toContain('## Checkout: Artificial');
-		expect(content).toContain('**Location:** `artificial`');
-		expect(content).toContain('**Branch:** `main`');
+		expect(content).toContain('**Location:** artificial');
+		expect(content).toContain('**Branch:** main');
 	});
 
 	it('WHEN the checkout is dirty it reports issues', async () => {
@@ -154,7 +154,7 @@ describe('clone command', () => {
 		expect(existsSync(recordFile)).toBe(true);
 		const content = readFileSync(recordFile, 'utf-8');
 		expect(content).toContain('## Checkout: Artificial');
-		expect(content).toContain('**Location:** `artificial-foo`');
+		expect(content).toContain('**Location:** artificial-foo');
 	});
 
 	it('WHEN an existing checkout is cloned again it is idempotent', async () => {

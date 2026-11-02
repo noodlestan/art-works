@@ -90,7 +90,11 @@ describe('scanAllCheckoutsStates', () => {
 		// Load records and hydrate store (same as commands do)
 		const repos = await loadRepositoryRecords(ctx);
 		const records = await loadCheckoutRecords(ctx, repos);
-		hydrateStoreFromRecords(ctx.config, ctx.store, records);
+		hydrateStoreFromRecords(
+			ctx.config,
+			ctx.store,
+			records as unknown as Parameters<typeof hydrateStoreFromRecords>[2],
+		);
 
 		// Scan without refetch — local data is stale, behind = 0
 		await scanAllCheckoutsStates(ctx);

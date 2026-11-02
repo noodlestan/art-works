@@ -1,4 +1,5 @@
 import { createFSRecordsAdapter } from '@art-lib/fs-records';
+import { createArtCodec } from '@art-md/codec';
 
 import type { WorkspaceConfig } from '../../config/types.js';
 import { createWorkspaceContext } from '../context/createWorkspaceContext.js';
@@ -13,5 +14,6 @@ export function createContext(config: WorkspaceConfig, logger: Logger): Workspac
 	const store = createCheckoutStore();
 	const log = createOperationsLog(logger.log);
 	const fsRecords = createFSRecordsAdapter(config.data.store);
-	return createWorkspaceContext(config, store, fsRecords, log);
+	const codec = createArtCodec({});
+	return createWorkspaceContext(config, store, fsRecords, codec, log);
 }

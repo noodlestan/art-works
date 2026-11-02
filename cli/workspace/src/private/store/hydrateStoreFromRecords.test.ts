@@ -1,5 +1,3 @@
-import { join } from 'node:path';
-
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
@@ -24,12 +22,12 @@ describe('hydrateStoreFromRecords', () => {
 			{
 				repo: { name: 'Alpha', remote: 'git@example.com:alpha.git' },
 				checkout: { name: 'Alpha', location: 'alpha', branch: 'main' },
-				filename: join(tempDir, '_records/checkouts/alpha.art'),
+				recordHandle: { name: 'Checkout: Alpha' } as unknown as import('@art-js/records').ArtRecord,
 			},
 			{
 				repo: { name: 'Beta', remote: 'git@example.com:beta.git' },
 				checkout: { name: 'Beta', location: 'beta', branch: 'develop' },
-				filename: join(tempDir, '_records/checkouts/beta.art'),
+				recordHandle: { name: 'Checkout: Beta' } as unknown as import('@art-js/records').ArtRecord,
 			},
 		];
 
@@ -41,16 +39,18 @@ describe('hydrateStoreFromRecords', () => {
 		expect(store.getCheckoutForLocation('beta')?.record.branch).toBe('develop');
 	});
 
-	it('WHEN a record is hydrated the filename is copied into the checkout', () => {
+	it('WHEN a record is hydrated the record handle is copied into the checkout', () => {
 		const tempDir = makeTempDir(tempDirs);
 		const config = makeConfigMock(tempDir);
 		const store = createCheckoutStore();
-		const filename = join(tempDir, '_records/checkouts/foo.art');
+		const recordHandle = {
+			name: 'Checkout: Foo',
+		} as unknown as import('@art-js/records').ArtRecord;
 		const records = [
 			{
 				repo: { name: 'Foo', remote: 'git@example.com:foo.git' },
 				checkout: { name: 'Foo', location: 'foo', branch: 'main' },
-				filename,
+				recordHandle,
 			},
 		];
 
@@ -58,17 +58,20 @@ describe('hydrateStoreFromRecords', () => {
 
 		const checkout = store.getCheckoutForLocation('foo');
 		expect(checkout).toBeDefined();
-		expect(checkout?.filename).toBe(filename);
+		expect(checkout?.recordHandle).toBe(recordHandle);
 	});
 
-	it('WHEN hydrate creates a new checkout it carries the source filename', () => {
+	it('WHEN hydrate creates a new checkout it carries the record handle', () => {
 		const tempDir = makeTempDir(tempDirs);
 		const config = makeConfigMock(tempDir);
 		const store = createCheckoutStore();
+		const recordHandle = {
+			name: 'Checkout: Orphan',
+		} as unknown as import('@art-js/records').ArtRecord;
 		const records = [
 			{
 				checkout: { name: 'Orphan', location: 'orphan', branch: 'main' },
-				filename: join(tempDir, '_records/checkouts/orphan.art'),
+				recordHandle,
 			},
 		];
 
@@ -77,6 +80,6 @@ describe('hydrateStoreFromRecords', () => {
 		const checkout = store.getCheckoutForLocation('orphan');
 		expect(checkout).toBeDefined();
 		expect(checkout?.repo).toBeUndefined();
-		expect(checkout?.filename).toBe(join(tempDir, '_records/checkouts/orphan.art'));
+		expect(checkout?.recordHandle).toBe(recordHandle);
 	});
 });

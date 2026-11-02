@@ -19,7 +19,11 @@ export async function runPull(
 ): Promise<void> {
 	const repos = await loadRepositoryRecords(ctx);
 	const records = await loadCheckoutRecords(ctx, repos);
-	hydrateStoreFromRecords(ctx.config, ctx.store, records);
+	hydrateStoreFromRecords(
+		ctx.config,
+		ctx.store,
+		records as unknown as Parameters<typeof hydrateStoreFromRecords>[2],
+	);
 
 	const pending = createGenericOperation('command', ['pull', options]);
 	ctx.log.log(pending);

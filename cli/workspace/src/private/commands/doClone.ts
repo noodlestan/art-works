@@ -3,7 +3,7 @@ import { cloneCheckout } from '../git/cloneCheckout.js';
 import { getCurrentBranch } from '../git/getCurrentBranch.js';
 import { createOperationFailure } from '../operations/createOperationFailure.js';
 import { createOperationSuccess } from '../operations/createOperationSuccess.js';
-import { saveCheckoutRecord } from '../resources/checkout/saveCheckoutRecord.js';
+import { upsertCheckoutRecord } from '../resources/checkout/upsertCheckoutRecord.js';
 import { scanCheckoutState } from '../scan/scanCheckoutState.js';
 import type { Checkout } from '../store/createCheckout.js';
 
@@ -17,18 +17,16 @@ export async function doClone(ctx: WorkspaceContext, checkout: Checkout): Promis
 		ctx.log.log(pending);
 		await cloneCheckout(checkout.repo.remote, checkout.path, checkout.record.branch);
 		const rescan = await scanCheckoutState(ctx, checkout);
-		ctx.store.updateCheckout(rescan);
 		ctx.log.log(createOperationSuccess(createCloneOperation(rescan)));
 
 		const actualBranch = await getCurrentBranch(checkout.path);
-		await saveCheckoutRecord(ctx.config, {
-			name: rescan.record.name,
-			repository: rescan.repo?.name,
-			location: rescan.record.location,
-			branch: actualBranch || rescan.record.branch || 'main',
+		const withRecord = await upsertCheckoutRecord(ctx, {
+			...rescan,
+			record: { ...rescan.record, branch: actualBranch || rescan.record.branch || 'main' },
 		});
+		ctx.store.updateCheckout(withRecord);
 
-		return rescan;
+		return withRecord;
 	} catch (error) {
 		ctx.log.log(createOperationFailure(pending, error));
 		return null;

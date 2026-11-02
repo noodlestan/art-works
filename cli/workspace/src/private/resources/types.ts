@@ -6,12 +6,6 @@ export interface RepositoryRecord {
 	consumers?: string;
 }
 
-export interface RepositoryCheckoutRecord {
-	repo?: RepositoryRecord;
-	checkout: CheckoutRecord;
-	filename: string;
-}
-
 export interface CheckoutRecord {
 	name: string;
 	repository?: string;

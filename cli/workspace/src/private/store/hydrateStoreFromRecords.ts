@@ -1,22 +1,30 @@
+import type { ArtRecord } from '@art-js/records';
+
 import type { WorkspaceConfig } from '../../config/types.js';
-import type { RepositoryCheckoutRecord } from '../resources/types.js';
+import type { CheckoutRecord, RepositoryRecord } from '../resources/types.js';
 
 import { createCheckout } from './createCheckout.js';
 import type { CheckoutStore } from './createCheckoutStore.js';
 
+export interface RepositoryCheckoutRecordHandle {
+	repo?: RepositoryRecord;
+	checkout: CheckoutRecord;
+	recordHandle: ArtRecord;
+}
+
 export function hydrateStoreFromRecords(
 	config: WorkspaceConfig,
 	store: CheckoutStore,
-	records: RepositoryCheckoutRecord[],
+	records: RepositoryCheckoutRecordHandle[],
 ): void {
-	for (const record of records) {
+	for (const entry of records) {
 		const checkout = createCheckout(
 			config,
-			record.checkout.location,
-			record.repo,
-			record.checkout.branch,
-			record.checkout.name,
+			entry.checkout.location,
+			entry.repo,
+			entry.checkout.branch,
+			entry.checkout.name,
 		);
-		store.addCheckout({ ...checkout, filename: record.filename });
+		store.addCheckout({ ...checkout, recordHandle: entry.recordHandle });
 	}
 }

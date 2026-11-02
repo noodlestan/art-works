@@ -1,4 +1,5 @@
 import { createFSRecordsAdapter } from '@art-lib/fs-records';
+import { createArtCodec } from '@art-md/codec';
 
 import {
 	type WorkspaceContext,
@@ -15,6 +16,7 @@ export function makeCommandContextMock(tempDir: string, workspace?: Checkout): W
 	const store = createCheckoutStore();
 	const log = createOperationsLog();
 	const fsRecords = createFSRecordsAdapter(config.data.store);
-	const ctx = createWorkspaceContext(config, store, fsRecords, log, workspace);
+	const codec = createArtCodec({});
+	const ctx = createWorkspaceContext(config, store, fsRecords, codec, log, workspace);
 	return ctx;
 }

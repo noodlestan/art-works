@@ -53,7 +53,7 @@ describe('cloneSpecific', () => {
 		expect(existsSync(recordFile)).toBe(true);
 		const content = readFileSync(recordFile, 'utf-8');
 		expect(content).toContain('## Checkout: One');
-		expect(content).toContain('**Location:** `one`');
+		expect(content).toContain('**Location:** one');
 	});
 
 	it('WHEN the repo exists at another location it creates a second checkout', async () => {
@@ -76,7 +76,7 @@ describe('cloneSpecific', () => {
 		expect(existsSync(recordFile)).toBe(true);
 		const content = readFileSync(recordFile, 'utf-8');
 		expect(content).toContain('## Checkout: Foo @ bar');
-		expect(content).toContain('**Location:** `foo-bar`');
+		expect(content).toContain('**Location:** foo-bar');
 	});
 
 	it('WHEN a custom location is given it uses the correct name and path', async () => {

@@ -1,4 +1,5 @@
 import { createFSRecordsAdapter } from '@art-lib/fs-records';
+import { createArtCodec } from '@art-md/codec';
 import { describe, expect, it } from 'vitest';
 
 import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
@@ -13,8 +14,9 @@ describe('createWorkspaceContext', () => {
 		const store = createCheckoutStore();
 		const log = createOperationsLog();
 		const fsRecords = createFSRecordsAdapter(config.data.store);
+		const codec = createArtCodec({});
 
-		const ctx = createWorkspaceContext(config, store, fsRecords, log);
+		const ctx = createWorkspaceContext(config, store, fsRecords, codec, log);
 
 		expect(ctx.config).toBe(config);
 		expect(ctx.config.root.path).toBe('.');

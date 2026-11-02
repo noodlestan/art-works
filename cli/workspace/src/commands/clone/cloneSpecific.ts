@@ -6,7 +6,7 @@ import type { WorkspaceContext } from '../../private/context/createWorkspaceCont
 import { createOperationFailure } from '../../private/operations/createOperationFailure.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';
-import { saveCheckoutRecord } from '../../private/resources/checkout/saveCheckoutRecord.js';
+import { upsertCheckoutRecord } from '../../private/resources/checkout/upsertCheckoutRecord.js';
 import type { RepositoryRecord } from '../../private/resources/types.js';
 import { createCheckout } from '../../private/store/createCheckout.js';
 import { createCheckoutLocation } from '../../private/store/createCheckoutLocation.js';
@@ -54,11 +54,10 @@ export async function cloneSpecific(
 
 		const checkoutName = checkoutInput ? `${repo.name} @ ${checkoutInput}` : repo.name;
 		const created = createCheckout(ctx.config, location, repo, 'main', checkoutName);
+		const withRecord = await upsertCheckoutRecord(ctx, created);
+		ctx.store.addCheckout(withRecord);
 
-		ctx.store.addCheckout(created);
-		await saveCheckoutRecord(ctx.config, created.record);
-
-		await cloneIfMissing(ctx, created);
+		await cloneIfMissing(ctx, withRecord);
 	}
 
 	await scanAllCheckoutsStates(ctx);

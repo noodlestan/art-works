@@ -11,7 +11,8 @@ export function presentCheckoutRepositoryState(state: CheckoutRepositoryState): 
 
 	console.info('');
 	console.info(`Checkout:`);
-	console.info(`  record: ${state.target.filename || '(unknown)'}`);
+	const handle = (state.target as { recordHandle?: { name?: string } }).recordHandle;
+	console.info(`  record: ${handle?.name || '(unknown)'}`);
 	console.info(`  location: ${state.target.record.location || '(unknown)'}`);
 	console.info(`  branch: ${state.branch || state.target.record.branch}`);
 	if (state.target.scan && state.target.scan.issues().length > 0) {

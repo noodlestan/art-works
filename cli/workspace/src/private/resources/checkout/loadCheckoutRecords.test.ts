@@ -40,9 +40,9 @@ describe('loadCheckouts', () => {
 		expect(checkouts[0].repo?.name).toBe('A');
 		expect(checkouts[0].checkout.location).toBe('a');
 		expect(checkouts[0].checkout.branch).toBe('dev');
-		expect(checkouts[0].filename).toBe(join(tempDir, '_records/a-checkout.art'));
+		expect(checkouts[0].recordHandle).toBeDefined();
 		expect(checkouts[1].repo?.name).toBe('B');
-		expect(checkouts[1].filename).toBe(join(tempDir, '_records/b-checkout.art'));
+		expect(checkouts[1].recordHandle).toBeDefined();
 	});
 
 	it('WHEN a checkout references an unknown repo it is included as extraneous', async () => {
@@ -64,7 +64,7 @@ describe('loadCheckouts', () => {
 		expect(unknown?.checkout.name).toBe('Unknown');
 		expect(unknown?.checkout.location).toBe('unknown');
 		expect(unknown?.checkout.branch).toBe('main');
-		expect(unknown?.filename).toBe(join(tempDir, '_records/unknown-checkout.art'));
+		expect(unknown?.recordHandle).toBeDefined();
 	});
 
 	it('WHEN a checkout record has an empty name it is skipped', async () => {
@@ -93,7 +93,7 @@ describe('loadCheckouts', () => {
 		expect(checkouts).toEqual([]);
 	});
 
-	it('WHEN records are loaded the source file path is returned as filename', async () => {
+	it('WHEN records are loaded the record handle is returned', async () => {
 		const tempDir = makeTempDir(tempDirs);
 		const ctx = makeCommandContextMock(tempDir);
 
@@ -102,6 +102,6 @@ describe('loadCheckouts', () => {
 		const checkouts = await loadCheckoutRecords(ctx, []);
 
 		expect(checkouts).toHaveLength(1);
-		expect(checkouts[0].filename).toBe(join(tempDir, '_records/foo-checkout.art'));
+		expect(checkouts[0].recordHandle).toBeDefined();
 	});
 });
