@@ -1,136 +1,67 @@
 # Art Workspace Cli - Config
 
-**Purpose:** Explain the configuration system of the Art Workspace Cli: the `.art-workspace.mts` manifest, its structure, authoring, loading mechanism, package exports, and type safety.
+**Purpose:** Describe the workspace configuration this CLI reads: its shape, its defaults, and how it is loaded.
 
 ## Overview
 
-The workspace configuration is a TypeScript module (`.art-workspace.mts`) at the workspace root that exports workspace paths. It provides type-safe access to workspace structure via `defineConfig` and the `WorkspaceConfig` type.
+The workspace configuration is a TypeScript module at `<cwd>/.art-workspace.mts`. The CLI loads it through the published `@art-lib/config` package, using its decomposed API — `findReusableBundle`, `compileConfig`, `importConfigModule` — rather than a private loading pipeline.
 
-The config is **manually authored, not generated**. The config points the CLI at the record discovery pattern.
+The compiled bundle and its metadata are stored under `<cwd>/node_modules/.art-workspace/`. Caching is on by default; `--no-config-cache` forces a rebuild for a single invocation.
 
-### Cache
+The package owns none of this: the manifest name, the cache directory, the config shape, and the defaults all stay in this CLI.
 
-- **Where** — the compiled bundle and its metadata are cached under `<workspace root>/node_modules/.art-workspacespace/`: `config.bundle.mjs` (the bundled manifest) and `config.cache.json` (the cache metadata).
-- **Automatic invalidation** — `config.cache.json` records a sha256 hash per esbuild `metafile.inputs` entry. The cached bundle is reused only while every recorded input still exists and hashes to the same value; a changed, missing, or unreadable input, a missing `config.bundle.mjs`, unparseable metadata, or a `version` mismatch in the metadata triggers a rebuild.
-- **Manual bust** — run any command with `--no-config-cache`, or delete `node_modules/.art-workspacespace/`.
+## Configuration Shape
 
-## Configuration Structure
+The manifest exports a partial config through `defineConfig`, which fills the defaults below and normalises the record paths.
 
 ```typescript
 interface WorkspaceConfig {
   root: { path: string };
-  clone: { path: string };
-  checkouts: { path: string; template: string };
-  records: { paths: FSRecordsPath[] };
-}
-
-// from @art-lib/fs-records
-interface FSRecordsPath {
-  base: string; // default '.'
-  pattern: string | string[]; // default '*.art'
-  ignored: string[]; // default ['node_modules/', '.git/', 'dist/']
-  excluded: string[]; // default []
-  gitignore: boolean; // default true
+  checkouts: { path: string };
+  data: { store: FSRecordsAdapterOptions; template: string };
+  discover: { records: { paths: FSRecordsPattern[] } };
 }
 ```
 
-## Options overview
+## Defaults
 
-The `records` option controls how the CLI discovers record files. It is a partial path config plus an optional `paths` array; everything normalizes to a list of independent, additive scans.
+Applied by `defineConfig` whenever the manifest omits a field:
 
-| Option      | Type                 | Default                               | Meaning                                                                  |
-| ----------- | -------------------- | ------------------------------------- | ------------------------------------------------------------------------ |
-| `base`      | `string`             | `'.'`                                 | Scan root, relative to the workspace root.                               |
-| `pattern`   | `string \| string[]` | `'*.art'`                             | Glob pattern(s) for record files within the base.                        |
-| `ignored`   | `string[]`           | `['node_modules/', '.git/', 'dist/']` | Baseline nested excludes.                                                |
-| `excluded`  | `string[]`           | `[]`                                  | Additional nested excludes, merged with `ignored`.                       |
-| `gitignore` | `boolean`            | `true`                                | Whether to apply `git check-ignore` as a post-filter.                    |
-| `paths`     | `array`              | `[]`                                  | Scoped scans; each inherits the top-level defaults, overridden per path. |
+| Field            | Default                                                 |
+| ---------------- | ------------------------------------------------------- |
+| `root.path`      | `process.cwd()`                                         |
+| `checkouts.path` | `'checkouts'`                                           |
+| `data.template`  | `.agents/domains/workspace/templates/checkout.art.njk`  |
+| `data.store`     | `{ basePath: '_records/', patterns: [recordsPattern] }` |
 
-**Discovery logic:**
+A relative `data.store.basePath` resolves against `root.path`.
 
-- Each `paths` entry is an independent scan anchored to its `base`; the glob is `join(root, base, pattern)`.
-- `ignored`/`excluded` exclude **nested** paths within the base, never the base itself — so `{ base: 'node_modules/', ignored: [] }` scans `node_modules/` while clearing the baseline for its contents.
-- `path.ignored` **overrides** `records.ignored`; `excluded` **merges** with it.
-- `gitignore: true` (default) applies `git check-ignore`; `false` skips it.
-- Results across all paths are unioned and deduped.
-- There is **no `included`** — to include something outside the main scan, add another `paths` entry with a different `base`.
+Record discovery, applied to each entry under `discover.records`:
 
-Example:
+| Option      | Default                               |
+| ----------- | ------------------------------------- |
+| `base`      | `'.'`                                 |
+| `pattern`   | `'*.art'`                             |
+| `ignored`   | `['node_modules/', '.git/', 'dist/']` |
+| `excluded`  | `[]`                                  |
+| `gitignore` | `true`                                |
 
-```typescript
-records: {
-  pattern: '*.art',
-  paths: [
-    { base: '.', excluded: ['checkouts/'] },
-    { base: '_records/checkouts' },
-    { base: 'node_modules/', pattern: '*.{art,md}', ignored: [] },
-    { base: 'generated/', gitignore: false },
-  ],
-}
-```
+## How It Is Used
 
-## Authoring Config
+1. Resolve `<cwd>/.art-workspace.mts`. If it is missing, the CLI warns and falls back to the defaults above.
+2. `findReusableBundle(cacheDir, baseDir)` — reuse the compiled bundle while its recorded inputs are unchanged.
+3. On a miss, `compileConfig(manifestPath, { cacheDir, baseDir, externals: ['simple-git'] })`. Node builtins and `esbuild` are external by package default.
+4. `importConfigModule<PartialWorkspaceConfig>(bundlePath)` — take the default export and pass it through `defineConfig`.
 
-The manifest imports `defineConfig` from the `/config` subpath:
+`--no-config-cache` sets `cache: false`, which skips step 2, rebuilds, and refreshes the cache so the next run is warm.
+
+Authoring a manifest:
 
 ```typescript
 import { defineConfig } from '@art-works/workspace-cli/config';
 
 export default defineConfig({
-  clone: { path: 'repos' },
-  checkouts: {
-    path: '_records/checkouts/',
-    template: '.agents/domains/workspace/templates/checkout.art.njk',
-  },
-  records: { pattern: '*.art' },
+  checkouts: { path: '_records/checkouts/' },
+  discover: { records: { defaults: { pattern: '*.art' } } },
 });
 ```
-
-## Loading Mechanism
-
-The CLI loads the config at runtime using esbuild bundle-at-runtime (Vite-style):
-
-1. Read `.art-workspace.mts`.
-2. Run `esbuild.build({ entryPoints, bundle: true, write: false, format: 'esm', platform: 'node' })`.
-3. Write the bundled output to a temp `.mjs` file.
-4. `await import()` the temp file.
-
-The config's `import { defineConfig } from '@art-works/workspace-cli/config'` is resolved from the consumer `node_modules` and inlined. The `/config` subpath has zero runtime deps beyond `esbuild` (ESM-friendly), so the CLI command surface (commander, simple-git) never enters the manifest bundle. `esbuild` is therefore a **runtime dependency** of `@art-works/workspace-cli` (see `records/adr/cli.art` — "Runtime Config Loading — esbuild Bundle-at-Runtime").
-
-## Package Exports
-
-The CLI package exports two surfaces:
-
-- **`@art-works/workspace-cli/config`** — Authoring API for the manifest: `defineConfig`, the `WorkspaceConfig` type, and `loadWorkspaceConfig`.
-- **`@art-works/workspace-cli`** — Main entry (the `art-workspace-cli` binary) re-exports the config module for the CLI commands and backwards compatibility.
-
-The `exports` map (`./config` → `types` + `import`) keeps the authoring surface stable: renaming types or exports is a breaking change once consumers exist — the manifest is the first consumer.
-
-## Type Safety
-
-The config types mirror the workspace structures:
-
-- `WorkspaceConfig` — top-level config with paths (`root.path`, `clone.path`, `checkouts.*`, `records.*`).
-- `RepositoryRecord` — repository facts (name, remote, purpose, description, consumers).
-- `CheckoutRecord` — checkout state (name, location, branch, repository).
-
-Type declarations are emitted (`dist/index.d.ts`) and the `exports` map ensures imports resolve and type-check in the `.mts` manifest.
-
-## Why `.mts`?
-
-The root `package.json` has no `"type": "module"`. The explicit `.mts` extension:
-
-- Pins ESM for Node and bundlers.
-- Is unambiguous under Node's native type-stripping.
-- Signals TypeScript authoring to editors and tooling.
-
-## Design Decisions
-
-The configuration design is captured in `records/adr/cli.art`:
-
-- **Type-safe Configuration in Workspace Root** — `.art-workspace.mts` as a TypeScript ESM module; `/config` subpath for the authoring API; main entry re-exports for the CLI.
-- **Runtime Config Loading — esbuild Bundle-at-Runtime** — the manifest is bundled and imported at runtime; `esbuild` becomes a runtime dependency. Reconsider Node native type-stripping when the minimum Node version is guaranteed (≥ 22.6).
-- **Manifest Mirrors Records Structures; Checkouts Derived at Entry Point** — superseded in part by the Checkout record decision below.
-- **Checkouts as CLI-Managed Records — Structure: Checkout** — status Proposed in the ADR but effectively adopted in implementation: checkouts are persisted in their own records (`_records/checkouts/{repo}.art`) and managed by CLI commands.
-- **Records as Source of Truth** — generated files (`.art-workspace.mts`) are derived from records, not maintained separately.

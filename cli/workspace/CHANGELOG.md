@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.3.1
+
+### Changed
+
+- **Adopted `@art-lib/config`:** the Workspace Cli now reads its manifest through the published package instead of its own compile/cache/import pipeline; the private config modules are deleted.
+- Behaviour is unchanged: config still comes from `.art-workspace.mts` at the workspace root, is cached under `node_modules/.art-workspace/`, and `--no-config-cache` still forces a rebuild.
+
 ## 0.3.0
 
 ### Changed
