@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { build } from 'esbuild';
+import { compileConfig } from '@art-lib/config';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeConfigCachePaths } from '../test/helpers/config/makeConfigCachePaths.js';
@@ -13,16 +13,19 @@ import type { ConfigCacheMeta } from './types.js';
 
 import { loadWorkspaceConfig } from './index.js';
 
-vi.mock('esbuild', async importOriginal => {
-	const actual = await importOriginal<typeof import('esbuild')>();
+// The esbuild bundle-at-runtime pipeline now runs inside `@art-lib/config`; spy on its
+// `compileConfig` entry point to count rebuilds — externalized package code cannot see
+// an `esbuild` mock declared here.
+vi.mock('@art-lib/config', async importOriginal => {
+	const actual = await importOriginal<typeof import('@art-lib/config')>();
 
 	return {
 		...actual,
-		build: vi.fn(actual.build),
+		compileConfig: vi.fn(actual.compileConfig),
 	};
 });
 
-const buildMock = vi.mocked(build);
+const compileMock = vi.mocked(compileConfig);
 
 const SOME_CONFIG = JSON.stringify({
 	root: { path: 'root-path' },
@@ -50,7 +53,7 @@ function sha256(content: string): string {
 }
 
 beforeEach(() => {
-	buildMock.mockClear();
+	compileMock.mockClear();
 	vi.spyOn(console, 'info').mockImplementation(() => {});
 	vi.spyOn(console, 'warn').mockImplementation(() => {});
 	vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -170,7 +173,7 @@ describe('loadWorkspaceConfig', () => {
 
 		const config = await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(vi.mocked(console.info)).not.toHaveBeenCalledWith('⚙️ [config] reused cached bundle');
 
 		await loadWorkspaceConfig(tempDir, { verbose: true });
@@ -186,12 +189,12 @@ describe('loadWorkspaceConfig', () => {
 
 		await loadWorkspaceConfig(tempDir);
 
-		buildMock.mockClear();
+		compileMock.mockClear();
 		writeFileSync(manifestPath, `export default ${CHANGED_CONFIG}`);
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(readCacheMeta(tempDir).inputs).toEqual([
 			{ path: '.art-workspace.mts', hash: sha256(readFileSync(manifestPath, 'utf8')) },
 		]);
@@ -217,12 +220,12 @@ describe('loadWorkspaceConfig', () => {
 
 		await loadWorkspaceConfig(tempDir);
 
-		buildMock.mockClear();
+		compileMock.mockClear();
 		writeFileSync(settingsPath, "export const clonePath = 'second-clone';\n");
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(readCacheMeta(tempDir).inputs).toEqual(
 			expect.arrayContaining([
 				{ path: 'settings.mts', hash: sha256(readFileSync(settingsPath, 'utf8')) },
@@ -238,11 +241,11 @@ describe('loadWorkspaceConfig', () => {
 		await loadWorkspaceConfig(tempDir);
 
 		rmSync(bundlePath);
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(existsSync(bundlePath)).toBe(true);
 	});
 
@@ -254,11 +257,11 @@ describe('loadWorkspaceConfig', () => {
 		await loadWorkspaceConfig(tempDir);
 
 		rmSync(metaPath);
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(existsSync(metaPath)).toBe(true);
 	});
 
@@ -270,11 +273,11 @@ describe('loadWorkspaceConfig', () => {
 		await loadWorkspaceConfig(tempDir);
 
 		writeFileSync(metaPath, '{not-json');
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 	});
 
 	it('GIVEN the cache metadata version mismatches a load rebuilds', async () => {
@@ -287,11 +290,11 @@ describe('loadWorkspaceConfig', () => {
 		const cacheMeta = readCacheMeta(tempDir);
 		const config = JSON.stringify({ ...cacheMeta, version: 2 });
 		writeFileSync(metaPath, config);
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 	});
 
 	it('GIVEN a recorded input is missing a load rebuilds', async () => {
@@ -305,11 +308,11 @@ describe('loadWorkspaceConfig', () => {
 		const ghostInput = { path: 'ghost.mts', hash: 'deadbeef' };
 		const config = JSON.stringify({ ...cacheMeta, inputs: [...cacheMeta.inputs, ghostInput] });
 		writeFileSync(metaPath, config);
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 	});
 
 	it('GIVEN a valid cache the default honours it and a cache false call rebuilds', async () => {
@@ -318,15 +321,15 @@ describe('loadWorkspaceConfig', () => {
 
 		await loadWorkspaceConfig(tempDir);
 
-		buildMock.mockClear();
+		compileMock.mockClear();
 		const reused = await loadWorkspaceConfig(tempDir);
 
-		expect(buildMock).not.toHaveBeenCalled();
+		expect(compileMock).not.toHaveBeenCalled();
 		expect(reused.checkouts.path).toBe('checkouts-path');
 
 		const rebuilt = await loadWorkspaceConfig(tempDir, { cache: false });
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(rebuilt.checkouts.path).toBe('checkouts-path');
 		expect(vi.mocked(console.info)).toHaveBeenCalledWith(
 			'⚙️ [config] cache bypassed, rebuilt bundle',
@@ -346,11 +349,11 @@ describe('loadWorkspaceConfig', () => {
 			inputs: [{ path: '.art-workspace.mts', hash: 'deadbeef' }],
 		};
 		writeFileSync(metaPath, JSON.stringify(staleMeta));
-		buildMock.mockClear();
+		compileMock.mockClear();
 
 		await loadWorkspaceConfig(tempDir, { cache: false });
 
-		expect(buildMock).toHaveBeenCalledTimes(1);
+		expect(compileMock).toHaveBeenCalledTimes(1);
 		expect(readCacheMeta(tempDir).inputs).toEqual([
 			{ path: '.art-workspace.mts', hash: sha256(readFileSync(manifestPath, 'utf8')) },
 		]);

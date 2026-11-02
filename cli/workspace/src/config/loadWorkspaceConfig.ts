@@ -1,15 +1,17 @@
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+
+import { compileConfig, findReusableBundle, importConfigModule } from '@art-lib/config';
 
 import { DEFAULT_RECORDS_STORE_OPTIONS } from './constants.js';
 import { defineConfig } from './defineConfig.js';
-import { compileConfigBundle } from './private/compileConfigBundle.js';
-import { findReusableBundlePath } from './private/findReusableBundlePath.js';
-import { importConfigBundle } from './private/importConfigBundle.js';
+import { formatError } from './private/formatError.js';
 import { removeLegacyBundle } from './private/removeLegacyBundle.js';
 import type { PartialWorkspaceConfig, WorkspaceConfig } from './types.js';
 
 const MANIFEST_FILE = '.art-workspace.mts';
+const CACHE_DIR_SEGMENTS = ['node_modules', '.art-workspace'] as const;
+const CONFIG_EXTERNALS: string[] = ['simple-git'];
 
 const DEFAULT_CONFIG: PartialWorkspaceConfig = {
 	root: { path: process.cwd() },
@@ -45,18 +47,37 @@ export async function loadWorkspaceConfig(
 	}
 
 	const useCache = options?.cache !== false;
+	const cacheDir = join(rootPath, ...CACHE_DIR_SEGMENTS);
+	const baseDir = dirname(resolve(manifestPath));
 
 	let reusableBundlePath: string | null = null;
 
 	if (useCache) {
-		reusableBundlePath = await findReusableBundlePath(rootPath);
+		reusableBundlePath = await findReusableBundle(cacheDir, baseDir);
 	}
 
-	if (reusableBundlePath !== null && options?.verbose) {
-		console.info('⚙️ [config] reused cached bundle');
-	}
+	let bundlePath: string;
 
-	const bundlePath = reusableBundlePath ?? (await compileConfigBundle(rootPath, manifestPath));
+	if (reusableBundlePath !== null) {
+		bundlePath = reusableBundlePath;
+
+		if (options?.verbose) {
+			console.info('⚙️ [config] reused cached bundle');
+		}
+	} else {
+		const compileOptions = { cacheDir, baseDir, externals: CONFIG_EXTERNALS };
+
+		try {
+			const compiled = await compileConfig(manifestPath, compileOptions);
+			bundlePath = compiled.bundlePath;
+		} catch (error) {
+			throw new Error(
+				`Failed to bundle workspace manifest at ${manifestPath}: ${formatError(error)}`,
+			);
+		}
+
+		console.info('⚙️ [config] rebuilt bundle');
+	}
 
 	if (!useCache) {
 		console.info('⚙️ [config] cache bypassed, rebuilt bundle');
@@ -64,5 +85,11 @@ export async function loadWorkspaceConfig(
 
 	removeLegacyBundle(rootPath);
 
-	return importConfigBundle(bundlePath, manifestPath, rootPath);
+	try {
+		const config = await importConfigModule<PartialWorkspaceConfig>(bundlePath);
+
+		return defineConfig({ ...config, root: { path: rootPath } });
+	} catch (error) {
+		throw new Error(`Failed to load workspace manifest at ${manifestPath}: ${formatError(error)}`);
+	}
 }
