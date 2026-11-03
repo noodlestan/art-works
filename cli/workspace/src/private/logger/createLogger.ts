@@ -1,4 +1,7 @@
-import type { Operation } from '../operations/types.js';
+import { createLogger as createBufferingLogger } from '@art-lib/logger';
+import type { LogFormatter, LogWriter, Message, MessageLevel, OutputMode } from '@art-lib/logger';
+
+import type { Operation, OperationOutcome } from '../operations/types.js';
 import { makeOperationLogLine } from '../present/makeOperationLogLine.js';
 
 export interface LoggerAPI {
@@ -6,44 +9,62 @@ export interface LoggerAPI {
 	setOutputMode: (mode: string | undefined) => void;
 }
 
-function isValidOutputMode(mode: string | undefined): mode is 'quiet' | 'verbose' {
-	return mode === 'quiet' || mode === 'verbose';
+/** A `Message` carrying the operation its log line is rendered from. */
+type OperationMessage = Message & { op: Operation };
+
+/**
+ * `quiet` writes `warning` and `error` only — the CLI's finished work. Pending
+ * operations map to `info` so `quiet` keeps dropping them, exactly as before.
+ */
+function levelOf(outcome: OperationOutcome): MessageLevel {
+	if (outcome === 'pending') {
+		return 'info';
+	}
+
+	return outcome === 'success' ? 'warning' : 'error';
+}
+
+const operationLogFormatter: LogFormatter = {
+	format(message: Message): string[] {
+		const { op } = message as OperationMessage;
+
+		return [makeOperationLogLine(op, { standalone: true }).join(' | ')];
+	},
+};
+
+const stdoutLogWriter: LogWriter = {
+	write(lines: string[]): void {
+		for (const line of lines) {
+			console.info(line);
+		}
+	},
+};
+
+function toMessage(op: Operation): OperationMessage {
+	return {
+		level: levelOf(op.outcome),
+		text: () => op.message(),
+		ts: op.ts.getTime(),
+		op,
+	};
+}
+
+function toOutputMode(mode: string | undefined): OutputMode {
+	return mode === 'verbose' ? 'verbose' : 'quiet';
 }
 
 export function createLogger(): LoggerAPI {
-	let mode: 'quiet' | 'verbose' | undefined;
-	const buffer: Operation[] = [];
-
-	function flush(): void {
-		for (const op of buffer) {
-			if (op.outcome !== 'pending' || mode === 'verbose') {
-				console.info(makeOperationLogLine(op, { standalone: true }).join(' | '));
-			}
-		}
-		buffer.length = 0;
-	}
+	const logger = createBufferingLogger({
+		formatter: operationLogFormatter,
+		writer: stdoutLogWriter,
+	});
 
 	return {
 		log(op: Operation): void {
-			if (mode === undefined) {
-				buffer.push(op);
-				return;
-			}
-
-			if (op.outcome !== 'pending' || mode === 'verbose') {
-				console.info(makeOperationLogLine(op, { standalone: true }).join(' | '));
-			}
-			// quiet mode discards all pending and future pending ops
+			logger.log(toMessage(op));
 		},
-
-		setOutputMode(newMode: string | undefined): void {
-			mode = isValidOutputMode(newMode) ? newMode : 'quiet';
-
-			if (mode === 'verbose') {
-				flush();
-			} else {
-				buffer.length = 0;
-			}
+		setOutputMode(mode: string | undefined): void {
+			logger.setOutputMode(toOutputMode(mode));
 		},
 	};
 }
