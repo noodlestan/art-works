@@ -2,7 +2,7 @@
 
 **ID:** `fix-pull-checkout-test`
 
-**Status:** `READY`
+**Status:** `WORKING`
 
 **Template:** `$DOMAINS/plans/templates/plan.tart`
 
@@ -386,4 +386,6 @@ Delegate iteration `assert-pull-error` to a worker, then integrate; after it lan
 
 ### Feedback
 
-- None yet.
+- **Commits without `Commit:` sections** — both `#### Commits:` table entries lack the `##### Commit:` section that `$DOMAINS/commits/templates/commit.tart` renders; message and policy live in the instruction steps instead. Rendering completeness only.
+- **Iteration-level `**Dependencies:**` not rendered** — the plan template places it between instructions and commits; the commit steps carry `**Dependencies:** None` instead. No blocking dependencies either way.
+- **Stale working-tree note in both iterations** — the "Before starting" claim of a pre-existing `_backlog/_parking-lot.md` modification no longer holds (`git status` in `$PROJECT` is clean); "stage only the files you changed" stays the operative rule.
