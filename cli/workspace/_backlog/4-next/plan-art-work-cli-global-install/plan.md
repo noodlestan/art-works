@@ -62,11 +62,11 @@ Update the Art Workspace Cli so that the globally installed executable can locat
 
 ### Next
 
-- Iteration `refactor-config-semantics` is a committed checkpoint (`102e828`): Steps 1–6 are complete, and Step 7 has adapter discovery/content wired. **The iteration remains `BLOCKED`** because Step 7 also requires extraction through `@art-js/records`, which is not declared or installed in `@art-works/workspace-cli`; `npm info @art-js/records version` returns 404 from the configured registry. Complete facade extraction and rerun CI when that dependency is available; only then proceed to the dependent iterations.
+- Iteration `refactor-config-semantics` is a committed checkpoint (`102e828`): Steps 1–6 are complete, and Step 7 has adapter discovery/content wired. The availability blocker is void — `@art-js/records@0.1.0` is declared in `cli/workspace/package.json` (commit `b955f3c`) and installed. Open: extract the four remaining record kinds (`repository`, `namespace`, `project`, `package`) through the facade — they still use the legacy `read*Record` parsers — re-baseline `instructions/refactor-config-semantics.md`, and rerun `npm run ci`; only then proceed to the dependent iterations.
 
 ### Blockers
 
-- **Implementation blocker:** Step 7 requires the `@art-js/records` facade, but the package is not declared or installed and is not available from the configured npm registry (`npm info` returns 404). Discovery/content migration is committed; extraction still uses existing `read*Record` parsers. The `@art-lib/fs-records@0.0.2` prerequisite is delivered.
+- None.
 
 ---
 
@@ -120,7 +120,7 @@ Additionally verify the CLI from a global installation and from the local develo
 
 | Iteration / Instructions               | Status    |
 | -------------------------------------- | --------- |
-| Iteration: Refactor Config Semantics   | `BLOCKED` |
+| Iteration: Refactor Config Semantics   | `WORKING` |
 | Iteration: Discover configuration file | `READY`   |
 | Iteration: Add Init command            | `READY`   |
 | Iteration: Update Art Work Knowledge   | `READY`   |
@@ -129,7 +129,7 @@ Additionally verify the CLI from a global installation and from the local develo
 
 **Id:** `refactor-config-semantics`
 
-**Status:** `BLOCKED`
+**Status:** `WORKING`
 
 **Purpose:** Make the intent behind each config option more explicit.
 
@@ -232,8 +232,8 @@ Change all discovery invokations of `findRecordFiles()` to use the discovery con
 
 **Dependencies:**
 
-- `@art-lib/fs-records@0.0.2` is delivered and provides `FSRecordsAdapter`, `FSRecordsAdapterOptions`, `FSRecordsPattern`, `FSContentSource`, `createFSRecordsAdapter()`, and `discoverRecordFiles()`.
-- The `@art-js/records` facade must be available to complete Step 7 extraction; it is not currently declared or installed, and `npm info @art-js/records version` returns 404.
+- `@art-lib/fs-records@0.0.3` is delivered and provides `FSRecordsAdapter`, `FSRecordsAdapterOptions`, `FSRecordsPattern`, `FSContentSource`, `createFSRecordsAdapter()`, and `discoverRecordFiles()`.
+- The `@art-js/records` facade is declared and installed (`@art-js/records@0.1.0`, commit `b955f3c`); Step 7 extraction for `repository`, `namespace`, `project`, and `package` remains.
 
 #### Commits:
 
@@ -253,7 +253,7 @@ refactor(art-workspace-cli): Refactor config options for better semantics.
 
 **Id:** `discover-config-location`
 
-**Status:** `PLANNING`
+**Status:** `READY`
 
 **Purpose:** Make the Art Workspace Cli execute independently of its source checkout when installed globally.
 
@@ -307,7 +307,7 @@ build(art-workspace-cli): Show config options.
 
 **Id:** `add-init-command`
 
-**Status:** `PLANNING`
+**Status:** `READY`
 
 **Purpose:** Make the Art Workspace Cli executable independently of its source checkout when installed globally.
 
@@ -342,7 +342,7 @@ build(art-workspace-cli): Add Init Command.
 
 **Id:** `update-art-work-knowledge`
 
-**Status:** `PLANNING`
+**Status:** `READY`
 
 **Purpose:** Update Art Work knowledge files to reflect the global-install capability and new configuration semantics.
 
@@ -386,20 +386,20 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 ### Evidence
 
 - Implementation checkpoint `102e828` is pushed. `npm run ci` passes: lint, build, 358 unit tests, and 26 integration tests.
-- `@art-lib/fs-records@0.0.2` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
+- `@art-lib/fs-records@0.0.3` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
 
 ### Findings
 
 - The provider boundary is **two units**: `FSRecordsAdapter{options, discoverRecordFiles(kinds?), createContentSource(file)}` — discovery only — and `FSContentSource extends ArtContentSource`, one per file (`uri`, `maybeContent`, `readContent(): Promise<string>`, `writeContent(content): Promise<void>`). All async. Serialisation belongs to the `@art-js/records` facade (`writeRecord(content, capsule, {guard?})`); the record-level `writeRecord(file, record, recordWrite)` from an earlier capture is retired.
-- `@art-lib/fs-records@0.0.2` now exports the agreed adapter surface; `FSRecordFile` uses `basePath`. The instruction file still contains stale `0.0.1` and old options examples and needs re-baselining before further delegated work.
+- `@art-lib/fs-records@0.0.3` now exports the agreed adapter surface; `FSRecordFile` uses `basePath`. The instruction file still contains stale `0.0.1` and old options examples and needs re-baselining before further delegated work.
 - `FSRecordFile.searchPath` is renamed to `FSRecordFile.basePath` in the provider plan; the consumer refactor must use `basePath`.
 - `discoverRecordFiles(kinds?)` filters by **filename**, not by heading — `FSRecordFile{filename, path, basePath}` carries no content, so the filter cannot consult a section (producer, 2026-10-16). The CLI's record filenames do not encode kind (`_records/art-work.art` holds `## Repository: Art Work`; `_records/package.art` holds four `## Package Dependency:` sections), so **call it with no `kinds` and filter by parsed heading kind in the CLI**.
-- `@art-js/records` carries no kind — `ArtRecord{name}` holds the whole heading text, `extractRecords(document)` takes no kinds filter, and any `SectionBlock` is a record (owner-authority decision, 2026-10-14). Kind detection and `Kind: Name` splitting are this CLI's responsibility; `readCheckoutRecord.ts` already reads `/## Checkout:\s*(.+)/`, so the parser moves rather than appears. Both `@art-md` contracts are `AGREED` 3/3 and `@art-md/constructs@0.0.4` is published; this plan's upstream pin stays `@art-md/primitives@0.0.3` (types only).
+- `@art-js/records` carries no kind — `ArtRecord{name}` holds the whole heading text, `extractRecords(document)` takes no kinds filter, and any `SectionBlock` is a record (owner-authority decision, 2026-10-14). Kind detection and `Kind: Name` splitting are this CLI's responsibility; `readCheckoutRecord.ts` already reads `/## Checkout:\s*(.+)/`, so the parser moves rather than appears. Both `@art-md` contracts are `AGREED` 3/3 and `@art-md/constructs@0.0.4` is published; `@art-md/primitives` is imported for types in `src/private/context/types.ts` and `src/private/context/createWorkspaceContext.ts` but is not declared in `cli/workspace/package.json` — it resolves transitively at `0.0.6` through `@art-lib/fs-records` and must be declared.
 - The target `WorkspaceConfig` shape drops the `clone` and `output` keys. `clone` is replaced by `checkouts`; `output` is removed and its consumers must be updated.
 
 ### Decisions
 
-- `refactor-config-semantics` is `BLOCKED` after a committed checkpoint: Steps 1–6 complete; Step 7 discovery/content migration complete, facade extraction pending; Step 8 checkpoint commit `102e828` is `COMMITTED`.
+- `refactor-config-semantics` is `WORKING` — the registry blocker is void (`@art-js/records@0.1.0` installed): Steps 1–6 complete; Step 7 discovery/content migration complete, facade extraction for the four remaining record kinds pending; checkpoint commit `102e828` is `COMMITTED`.
 - Iterations: Discover configuration file, Add Init command, and Update Art Work Knowledge are marked `READY`; they depend on Iteration: Refactor Config Semantics and must be delegated in order.
 - The `output` config key is removed per the target `WorkspaceConfig` shape; consumers are updated in Iteration: Refactor Config Semantics.
 
@@ -409,8 +409,8 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Follow Ups
 
-- Obtain/declare `@art-js/records`, then complete Step 7 facade extraction and rerun `npm run ci`; only then unblock the dependent iterations.
-- Re-baseline `instructions/refactor-config-semantics.md` against `@art-lib/fs-records@0.0.2` (Step 1 exports and Step 2 adapter options).
+- Complete Step 7 facade extraction for `repository`, `namespace`, `project`, and `package`, and rerun `npm run ci`; only then sequence the dependent iterations.
+- Re-baseline `instructions/refactor-config-semantics.md` against `@art-lib/fs-records@0.0.3` (Step 1 exports and Step 2 adapter options) and drop its stale `extractRecords`/`writeRecord` API and 404 text.
 - Confirm the `data.template` purpose (currently WIP) in a later iteration.
 
 ### Feedback

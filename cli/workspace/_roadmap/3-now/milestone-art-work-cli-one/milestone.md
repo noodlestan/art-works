@@ -10,7 +10,7 @@
 
 **Purpose:** Complete the workspace CLI with remaining commands and infrastructure.
 
-**Description:** This milestone delivers the full workspace CLI command surface and infrastructure across 3 phases: establish the CLI baseline, implement the remaining commands, and consolidate the CLI into its own repo and shared libraries.
+**Description:** This milestone delivers the full workspace CLI command surface and infrastructure across 4 phases: establish the CLI baseline, consolidate the CLI into its own repo and shared libraries, decompose into packages, and implement the remaining commands.
 
 ## Mandatory Reading
 
@@ -144,7 +144,7 @@ Complete the workspace CLI across 3 phases: establish the CLI baseline, implemen
 | 3     | Plan: Improvements and Fixes `_backlog/0-archive/2026-09-12-plan-improvements-and-fixes/plan.md`                             | `ARCHIVED` |
 | 3     | Plan: Make Art Workspace Cli work from global install `_backlog/4-next/plan-art-work-cli-global-install/plan.md`             | `PLANNING` |
 | 3     | Plan: Optimize Tests and Update Knowledge `_backlog/4-next/plan-optimize-tests-update-knowledge/plan.md`                     | `DRAFT`    |
-| 3     | Plan: Add Config Cache `_backlog/3-now/plan-add-config-cache/plan.md`                                                        | `DRAFT`    |
+| 3     | Plan: Add Config Cache `_backlog/0-archive/2026-10-13-plan-add-config-cache/plan.md`                                         | `ARCHIVED` |
 | -     |                                                                                                                              |            |
 | 4     | Plan: Replace Repo Command                                                                                                   | (create)   |
 | 4     | Plan: Replace Clone Command                                                                                                  | (create)   |
@@ -160,7 +160,6 @@ Complete the workspace CLI across 3 phases: establish the CLI baseline, implemen
 
 ### Next
 
-- Integrate `extract-read-write-records-art-lib`.
 - Prepare `art-work-cli-global-install` for delegation.
 
 ### Blockers

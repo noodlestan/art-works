@@ -35,10 +35,10 @@ Add hashing and caching to the CLI's expensive paths so repeated runs over an un
 
 ### Upstream Work
 
-| Kind        | Path                                                          | Role                                                                 |
-| ----------- | ------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Parking Lot | `$ART_WORKS_CLI/_backlog/_parking-lot.md`                     | Tracks short-term actionables, pending questions, and blockers.      |
-| Plan        | `$ART_WORKS_CLI/_backlog/3-now/plan-add-config-cache/plan.md` | The config cache establishes the hashing and cache-location pattern. |
+| Kind        | Path                                                                         | Role                                                                 |
+| ----------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Parking Lot | `$ART_WORKS_CLI/_backlog/_parking-lot.md`                                    | Tracks short-term actionables, pending questions, and blockers.      |
+| Plan        | `$ART_WORKS_CLI/_backlog/0-archive/2026-10-13-plan-add-config-cache/plan.md` | The config cache establishes the hashing and cache-location pattern. |
 
 ### Required Skills
 

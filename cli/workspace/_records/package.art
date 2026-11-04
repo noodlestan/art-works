@@ -6,7 +6,7 @@
 
 **Purpose:** Generic record read/write modules for Art MD record files.
 
-**Version:** `0.0.2`
+**Version:** `0.0.3`
 
 ## Package Dependency: Commander
 
@@ -22,7 +22,7 @@
 
 **Purpose:** Git operations library for status, push, clone, branch commands.
 
-**Version:** `3.36.0`
+**Version:** `4.0.2`
 
 ## Package Dependency: ESBuild
 
@@ -30,7 +30,39 @@
 
 **Purpose:** Workspace configs are expressed in `.mts` modules and need to be compiled by CLI.
 
-**Version:** `0.28.0`
+**Version:** `0.28.2`
+
+## Package Dependency: Art Lib Config
+
+**Canonical Name:** `@art-lib/config`
+
+**Purpose:** Typed config loading with bundle-at-runtime compilation and content-hash cache.
+
+**Version:** `0.0.1`
+
+## Package Dependency: Art Lib Logger
+
+**Canonical Name:** `@art-lib/logger`
+
+**Purpose:** Buffering logger with quiet and verbose modes, an injected formatter, and an injectable log writer.
+
+**Version:** `0.0.1`
+
+## Package Dependency: Art JS Records
+
+**Canonical Name:** `@art-js/records`
+
+**Purpose:** Record identity, discovery, extraction, update and serialisation for Markdown documents.
+
+**Version:** `0.1.0`
+
+## Package Dependency: Art MD Codec
+
+**Canonical Name:** `@art-md/codec`
+
+**Purpose:** Configurable Art MD codec: parse and serialize Art MD.
+
+**Version:** `0.0.3`
 
 ## Package: Art Workspace Cli
 
@@ -89,6 +121,10 @@
 
 - Runtime:
   - Package Dependency: Art Lib FS Records
+  - Package Dependency: Art Lib Config
+  - Package Dependency: Art Lib Logger
+  - Package Dependency: Art JS Records
+  - Package Dependency: Art MD Codec
   - Package Dependency: Commander
   - Package Dependency: Simple Git
   - Package Dependency: ESBuild

@@ -4,10 +4,10 @@ WIP tracker, structured like the session parking lot: **ACTIONABLE** (in progres
 
 ## Ongoing
 
-- **Rename the project `art-work` → `art-works`** — supersedes the dead "art box" rename; new target is `art-works`. The identity records and the package identity are renamed (`@art-works/workspace-cli`, bin `art-workspace-cli`, path `cli/workspace`); the checkout name, the workspace records, and the website project list wait for the new CLI install.
+- **Complete the `art-work` → `art-works` rename** — identity records, package identity (`@art-works/workspace-cli`, bin `art-workspace-cli`, path `cli/workspace`), checkout, and workspace records are renamed; residual naming decisions and follow-ups stay tracked in `milestone-rename-art-work-to-art-works`.
 - **Participate in the Art Boards Inception Whiteboard (owned by `ART_BOARDS`)** — board at `$ART_BOARDS/cli/whiteboard/_roadmap/whiteboard-art-boards-inception/whiteboard.md`.
 - **Participate in the Art Records Whiteboard (owned by `ART_JS`)** — board at `$ART_JS/_backlog/whiteboard-art-records/whiteboard.md`; this project is the highest priority.
-- **Implement `plan-art-work-cli-global-install`** — Steps 1–6/8 complete. Checkpoint `102e828` committed. Step 7 checkout load/modify/save is now migrated to `@art-js/records` + `@art-lib/fs-records` (source-bound `Checkout.recordHandle`, no filename threading); the remaining record kinds and the Step 7 instruction refresh are still open.
+- **Ship `plan-art-work-cli-global-install`** — make the CLI work from a global install; today that is driven by the top ACTIONABLE items: migrate the remaining record kinds to `@art-js/records`, refresh the Step 7 instructions, then delegate the plan (checkpoint `102e828`, Steps 1–6/8 complete).
 
 ---
 
@@ -24,7 +24,7 @@ None current.
 
 ## BLOCKERS
 
-None current. The former registry-availability blocker is resolved; `@art-js/records@0.0.1`, `@art-md/codec@0.0.3` and `@art-lib/fs-records@0.0.3` are all published and installed.
+None current. The former registry-availability blocker is resolved; `@art-js/records@0.1.0`, `@art-md/codec@0.0.3` and `@art-lib/fs-records@0.0.3` are all published and installed.
 
 ---
 
