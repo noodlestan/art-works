@@ -13,14 +13,12 @@ WIP tracker, structured like the session parking lot: **ACTIONABLE** (in progres
 
 ## ACTIONABLE
 
-- **Finish `plan-fix-pull-checkout-test`** — plan draft at `_backlog/4-next/plan-fix-pull-checkout-test/plan.md` (`DRAFT`): confirm which hypothesis explains the `export default {{{` config error leaking into CI, draft iterations, then delegate execution.
 - **Migrate the remaining record kinds to `@art-js/records`** — `repository`, `project`, `namespace`, `package` loaders still use the legacy `read*Record` regex parsers; reuse `checkoutFields` and the `upsert*Record` shape.
 - **Refresh Step 7 of `plan-art-work-cli-global-install`** — the instructions still describe the stale `extractRecords` / `writeRecord` API and the 404 blocker; rewrite them against `createRecordsDocument` / `ArtRecord` and the new provenance model.
-- **Report the typed-field gap to `@art-js/records`** — no way to express an `inlineCode` field value through the Records API; `checkoutFields` builds the construct locally to work around it.
 
 ## PENDING
 
-None current.
+- **Adopt the expanded fields API from `@art-js/records`** — waiting on `plan-expand-fields-api` at `$ART_JS/_backlog/4-next/plan-expand-fields-api/plan.md` (art-js, `PLANNING` in `4-next`) to land and publish: bump the dependency, update our field reads to call the new text-read method (the default accessor will return markdown, backticks included), keep the rule — tolerate backticked values on read, always write non-backticked — and retire the local `checkoutFields` workaround.
 
 ## BLOCKERS
 
