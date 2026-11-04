@@ -2,7 +2,7 @@
 
 **ID:** `art-work-cli-global-install`
 
-**Status:** `PLANNING`
+**Status:** `READY`
 
 **Template:** `.agents/domains/plans/templates/plan.tart`
 
@@ -20,15 +20,17 @@
 
 ## Path Variables
 
-| Variable     | Resolved Path                | Purpose                                                        |
-| ------------ | ---------------------------- | -------------------------------------------------------------- |
-| `$WORKSPACE` | Current working directory    | Workspace root directory                                       |
-| `$DOMAINS`   | `$WORKSPACE/.agents/domains` | Domain resources directory                                     |
-| `$ART_WORKS` | Provided with prompt.        | Art Work repository. Example: `$WORKSPACE/checkouts/art-works` |
+| Variable     | Resolved Path                    | Purpose                                            |
+| ------------ | -------------------------------- | -------------------------------------------------- |
+| `$WORKSPACE` | Current working directory        | Workspace root directory                           |
+| `$DOMAINS`   | `$WORKSPACE/.agents/domains`     | Domain resources directory                         |
+| `$ART_WORKS` | `$WORKSPACE/checkouts/art-works` | Art Works repository; hosts this plan and backlogs |
+| `$PACKAGE`   | `$ART_WORKS/cli/workspace`       | The package this plan changes                      |
+| `$ART_JS`    | `$WORKSPACE/checkouts/art-js`    | Art JS checkout; owns `@art-js/records`            |
 
 ## Summary
 
-Make the Art Workspace Cli executable and operational when installed globally, while preserving local development and monorepo usage. Update the CLI implementation and package metadata as required, and verify both invocation modes.
+Complete the global-install track so the globally installed `art-workspace-cli` discovers its configuration and runs independently of its source checkout: close `refactor-config-semantics` as delivered at checkpoint `102e828` (config semantics and discovery/content wiring committed), move the four legacy record-kind loaders (`repository`, `namespace`, `project`, `package`) from the `read*Record` regex parsers onto the installed `@art-js/records@0.1.0` facade in a dedicated iteration mirroring the migrated checkout loader, then deliver config discovery (cwd/parent scan, `.art` compile, defaults, run banner), the `init` command, and the knowledge updates, coordinated from the ACTIONABLE items in `$ART_WORKS/_backlog/_parking-lot.md`.
 
 ## Context
 
@@ -56,13 +58,13 @@ Make the Art Workspace Cli executable and operational when installed globally, w
 
 ## Scope
 
-Update the Art Workspace Cli so that the globally installed executable can locate its runtime and operate against the intended Art Work workspace independently of the CLI's installation directory.
+Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-semantics refactor as delivered; extract the four record-kind loaders to the facade with fixture-parity tests and retire the legacy parsers; discover configuration from the cwd and parents with defaults and an on-run banner; add the `init` command; update the knowledge files. The registry-availability blocker is void — `@art-js/records@0.1.0` is declared (commit `b955f3c`) and installed.
 
 ## Work
 
 ### Next
 
-- Iteration `refactor-config-semantics` is a committed checkpoint (`102e828`): Steps 1–6 are complete, and Step 7 has adapter discovery/content wired. The availability blocker is void — `@art-js/records@0.1.0` is declared in `cli/workspace/package.json` (commit `b955f3c`) and installed. Open: extract the four remaining record kinds (`repository`, `namespace`, `project`, `package`) through the facade — they still use the legacy `read*Record` parsers — re-baseline `instructions/refactor-config-semantics.md`, and rerun `npm run ci`; only then proceed to the dependent iterations.
+- `refactor-config-semantics` is `DELIVERED` at checkpoint `102e828` and its instruction file is re-baselined. Delegate `migrate-record-kinds-to-facade` (`READY`, instructions authored) next; the dependent iterations — `discover-config-location`, `add-init-command`, `update-art-work-knowledge` — follow in order.
 
 ### Blockers
 
@@ -118,18 +120,19 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions               | Status    |
-| -------------------------------------- | --------- |
-| Iteration: Refactor Config Semantics   | `WORKING` |
-| Iteration: Discover configuration file | `READY`   |
-| Iteration: Add Init command            | `READY`   |
-| Iteration: Update Art Work Knowledge   | `READY`   |
+| Iteration / Instructions                  | Status      |
+| ----------------------------------------- | ----------- |
+| Iteration: Refactor Config Semantics      | `DELIVERED` |
+| Iteration: Migrate Record Kinds to Facade | `READY`     |
+| Iteration: Discover configuration file    | `READY`     |
+| Iteration: Add Init command               | `READY`     |
+| Iteration: Update Art Work Knowledge      | `READY`     |
 
 ### Iteration: Refactor Config Semantics
 
 **Id:** `refactor-config-semantics`
 
-**Status:** `WORKING`
+**Status:** `DELIVERED`
 
 **Purpose:** Make the intent behind each config option more explicit.
 
@@ -213,6 +216,8 @@ Replace direct `findRecordFiles()` calls with `fsRecords.discoverRecordFiles()` 
 - `cli/workspace/src/private/resources/checkout/loadCheckoutRecords.ts`
 - `cli/workspace/src/private/resources/repository/loadRepositoryRecords.ts`
 
+Delivered at `102e828` for discovery, content, and the checkout loader; the `repository`, `namespace`, `project`, and `package` extraction is carved out to Iteration: Migrate Record Kinds to Facade.
+
 Change `clone` => `checkouts`:
 
 - Update `cli/workspace/src/config/defineConfig.ts`
@@ -249,6 +254,47 @@ Change all discovery invokations of `findRecordFiles()` to use the discovery con
 refactor(art-workspace-cli): Refactor config options for better semantics.
 ```
 
+### Iteration: Migrate Record Kinds to Facade
+
+**Id:** `migrate-record-kinds-to-facade`
+
+**Status:** `READY`
+
+**Purpose:** Finish Step 7 extraction so every record kind reads through the `@art-js/records` facade and no legacy parser remains.
+
+**Description:** Move the `repository`, `namespace`, `project`, and `package` loaders off the `read*Record` regex parsers onto the facade, mirroring the migrated checkout loader — discovery without `kinds`, content through the adapter source, extraction through `createRecordsDocument`, `Kind: Name` splitting in the CLI, and field reads through the record handle — then retire the four parser files and migrate their unit tests to loader-level fixture parity.
+
+**Instructions Mode:** `INSTRUCTIONS_SELF_CONTAINED_FILE`
+
+**Instructions:** `./plan-art-work-cli-global-install/instructions/migrate-record-kinds-to-facade.md`
+
+**Changes:**
+
+- Rewrite `cli/workspace/src/private/resources/repository/loadRepositoryRecords.ts`, `namespace/loadNamespaceRecords.ts`, `project/loadProjectRecords.ts`, and `package/loadPackageRecords.ts` to extract via `createRecordsDocument` exactly as `checkout/loadCheckoutRecords.ts` does.
+- Delete `readRepositoryRecord.ts`, `readNamespaceRecord.ts`, `readProjectRecord.ts`, and `readPackageRecord.ts`; migrate their unit tests to loader-level tests asserting identical parsed output.
+- Keep discovery on `fsRecords.discoverRecordFiles()` without `kinds` (the filename filter cannot match headings), content on `createContentSource(file).readContent()`, and filter `file.error` before reading.
+- Preserve field contracts: tolerate backticked values on read, always write non-backticked (`checkoutFields` untouched); use `FSRecordFile.basePath` only.
+
+**Dependencies:**
+
+- Iteration: Refactor Config Semantics.
+
+#### Commits:
+
+| ID                               | Repository / Checkout / Branch    | Policy       | Hash  | Status        |
+| -------------------------------- | --------------------------------- | ------------ | ----- | ------------- |
+| `migrate-record-kinds-to-facade` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | (TBD) | `PLACEHOLDER` |
+
+##### Commit: `migrate-record-kinds-to-facade`
+
+**Repository:** Art Works
+
+**Message:**
+
+```text
+refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
+```
+
 ### Iteration: Discover configuration file
 
 **Id:** `discover-config-location`
@@ -270,14 +316,15 @@ refactor(art-workspace-cli): Refactor config options for better semantics.
 **Dependencies:**
 
 - Iteration: Refactor Config Semantics.
+- Iteration: Migrate Record Kinds to Facade.
 
 #### Commits:
 
-| ID                           | Repository / Checkout / Branch       | Policy       | Hash | Status        |
-| ---------------------------- | ------------------------------------ | ------------ | ---- | ------------- |
-| `discover-config-location`   | Art Work / `$ART_WORKS` / `building` | `AUTONOMOUS` |      | `PLACEHOLDER` |
-| `compile-config-to-temp-dir` | Art Work / `$ART_WORKS` / `building` | `AUTONOMOUS` |      | `PLACEHOLDER` |
-| `show-config-options`        | Art Work / `$ART_WORKS` / `building` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                           | Repository / Checkout / Branch    | Policy       | Hash | Status        |
+| ---------------------------- | --------------------------------- | ------------ | ---- | ------------- |
+| `discover-config-location`   | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| `compile-config-to-temp-dir` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| `show-config-options`        | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
 
 ##### Commit: `discover-config-location`
 
@@ -326,9 +373,9 @@ build(art-workspace-cli): Show config options.
 
 #### Commits:
 
-| ID                 | Repository / Checkout / Branch       | Policy       | Hash | Status        |
-| ------------------ | ------------------------------------ | ------------ | ---- | ------------- |
-| `add-init-command` | Art Work / `$ART_WORKS` / `building` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                 | Repository / Checkout / Branch    | Policy       | Hash | Status        |
+| ------------------ | --------------------------------- | ------------ | ---- | ------------- |
+| `add-init-command` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
 
 ##### Commit: `add-init-command`
 
@@ -363,9 +410,9 @@ build(art-workspace-cli): Add Init Command.
 
 #### Commits:
 
-| ID                          | Repository / Checkout / Branch       | Policy       | Hash | Status        |
-| --------------------------- | ------------------------------------ | ------------ | ---- | ------------- |
-| `update-art-work-knowledge` | Art Work / `$ART_WORKS` / `building` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                          | Repository / Checkout / Branch    | Policy       | Hash | Status        |
+| --------------------------- | --------------------------------- | ------------ | ---- | ------------- |
+| `update-art-work-knowledge` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
 
 ##### Commit: `update-art-work-knowledge`
 
@@ -381,7 +428,8 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Not In Scope
 
-- None
+- **Fields-API adoption** — the expanded read/write surface from `plan-expand-fields-api` (`$ART_JS/_backlog/4-next/plan-expand-fields-api/plan.md`) is a separate PENDING item in `$ART_WORKS/_backlog/_parking-lot.md`; this plan keeps the current rule — tolerate backticked values on read, always write non-backticked through `checkoutFields`.
+- **Publishing** — no release or version bump in this plan.
 
 ### Evidence
 
@@ -399,8 +447,8 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Decisions
 
-- `refactor-config-semantics` is `WORKING` — the registry blocker is void (`@art-js/records@0.1.0` installed): Steps 1–6 complete; Step 7 discovery/content migration complete, facade extraction for the four remaining record kinds pending; checkpoint commit `102e828` is `COMMITTED`.
-- Iterations: Discover configuration file, Add Init command, and Update Art Work Knowledge are marked `READY`; they depend on Iteration: Refactor Config Semantics and must be delegated in order.
+- `refactor-config-semantics` is `DELIVERED` at checkpoint `102e828` — Steps 1–6, discovery/content wiring, and the checkout facade shipped; the remaining four-kind extraction is carved into Iteration: Migrate Record Kinds to Facade, whose instruction is authored against `createRecordsDocument`.
+- Iterations Migrate Record Kinds to Facade, Discover configuration file, Add Init command, and Update Art Work Knowledge are `READY` and must be delegated in order; placeholder commits execute on branch `main`.
 - The `output` config key is removed per the target `WorkspaceConfig` shape; consumers are updated in Iteration: Refactor Config Semantics.
 
 ### Knowledge to Update
@@ -409,9 +457,9 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Follow Ups
 
-- Complete Step 7 facade extraction for `repository`, `namespace`, `project`, and `package`, and rerun `npm run ci`; only then sequence the dependent iterations.
-- Re-baseline `instructions/refactor-config-semantics.md` against `@art-lib/fs-records@0.0.3` (Step 1 exports and Step 2 adapter options) and drop its stale `extractRecords`/`writeRecord` API and 404 text.
 - Confirm the `data.template` purpose (currently WIP) in a later iteration.
+- Declare `@art-md/primitives` in `cli/workspace/package.json` — direct type imports resolve transitively at `0.0.6` today.
+- Adopt the expanded fields API from `plan-expand-fields-api` once it lands (tracked in `$ART_WORKS/_backlog/_parking-lot.md` PENDING).
 
 ### Feedback
 

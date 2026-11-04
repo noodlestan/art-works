@@ -4,6 +4,8 @@
 
 **Iteration Id:** `refactor-config-semantics`
 
+> **Re-baselined 2026-11-04.** All eight steps shipped in commit `refactor-config-options` (`102e828`, `COMMITTED`, pushed). The four-kind facade extraction was carved out to `migrate-record-kinds-to-facade.md`. The stale `0.0.1`/`0.0.2` verification notes, the `extractRecords`/`writeRecord` API names, and the registry-availability (404) text are gone: `@art-lib/fs-records@0.0.3` and `@art-js/records@0.1.0` are installed, and extraction reads through `createRecordsDocument`.
+
 ## Before you Start
 
 ::switch `agent-worker` — switch to the agent-worker agent mode to execute these instructions. Your mode must be `worker` before you start changing files.
@@ -25,12 +27,12 @@ This section describes how to report back to the delegator after completing the 
 
 ## Path Variables
 
-| Variable     | Resolved Path                | Purpose                                                              |
-| ------------ | ---------------------------- | -------------------------------------------------------------------- |
-| `$WORKSPACE` | Current working directory    | Workspace root directory                                             |
-| `$DOMAINS`   | `$WORKSPACE/.agents/domains` | Domain resources directory                                           |
-| `$ART_WORKS` | Provided with prompt         | Art Work repository. Example: `$WORKSPACE/checkouts/art-works`       |
-| `$ART_LIB`   | Provided with prompt         | Art Lib repository. Example: `$WORKSPACE/checkouts/art-lib-building` |
+| Variable     | Resolved Path                    | Purpose                                           |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| `$WORKSPACE` | Current working directory        | Workspace root directory                          |
+| `$DOMAINS`   | `$WORKSPACE/.agents/domains`     | Domain resources directory                        |
+| `$ART_WORKS` | `$WORKSPACE/checkouts/art-works` | Art Works repository; hosts this plan and package |
+| `$PACKAGE`   | `$ART_WORKS/cli/workspace`       | The package this iteration changed                |
 
 ## Working Agreements
 
@@ -44,7 +46,7 @@ The plan workflow (see the entry point guide → Planning Workflow → Working T
 
 This section describes the goal(s) of this iteration.
 
-Make the intent behind each config option explicit by reshaping `WorkspaceConfig` to express `checkouts.path`, `data` (where managed records are stored), and `discover.records` (how records are scanned for in checkouts), and wire the records adapter into the workspace context.
+Make the intent behind each config option explicit by reshaping `WorkspaceConfig` to express `checkouts.path`, `data` (where managed records are stored), and `discover.records` (how records are scanned for in checkouts), and wire the records adapter into the workspace context. **Status: delivered at `102e828`; this file now records what shipped and what remains.**
 
 ## Mandatory Reading
 
@@ -54,7 +56,7 @@ This section lists the documentation and reference files the sub-agent needs to 
 - RULE: If you are unable to read a file linked under `## Mandatory Reading` you must stop and REPORT A BLOCKER.
 
 - knowledge: `$ART_WORKS/cli/workspace/knowledge/index.md`
-- provider contract: `$ART_LIB/_backlog/4-next/plan-add-fs-records-adapter/plan.md` (`READY`, 2026-10-13) — the supplier plan for `@art-lib/fs-records`. The whiteboard `AGREED` contracts are the authority for the symbols this iteration consumes.
+- canonical pattern: `$ART_WORKS/cli/workspace/src/private/resources/checkout/loadCheckoutRecords.ts` — the delivered facade extraction; the remaining four kinds are covered by `migrate-record-kinds-to-facade.md`.
 
 ---
 
@@ -62,7 +64,7 @@ This section lists the documentation and reference files the sub-agent needs to 
 
 ### Setting Up
 
-**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/setting-up.art`.
+**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/setting-up/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -70,23 +72,22 @@ Run from the `$WORKSPACE` root:
 
 ```bash
 npm ci # to install dependencies.
-npm run ci # to verify build is green before starting
 ```
 
-If any of these fail, resolve the issue before proceeding with implementation. Do NOT run `npm install` inside `$ART_WORKS` (the package directory) — a local `node_modules` there shadows the monorepo resolution and breaks the build.
+Do NOT run `npm install` inside `$ART_WORKS` (the package directory) — a local `node_modules` there shadows the monorepo resolution and breaks the build.
 
 ### Writing Commit Message
 
-**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/ops/writing-commit-message.art`.
+**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/writing-commit-message/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
 1. Read commit message conventions from `$WORKSPACE/knowledge/conventions/writing-commit-message.art`.
-2. Write the commit message following: the rules defined there.
+2. Write a message following: `{Type}({Scope}): {Description}.` max 120 chars, optionally followed by up 3 bullet points, max 100 chars each.
 
 ### Verifying Completion
 
-**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/verifying-completion.art`.
+**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/verifying-completion/operation.art`.
 
 **Instructions:** (From `$ART_WORKS/_guide.md`)
 
@@ -99,196 +100,35 @@ npm run build
 npm run test
 ```
 
-Additionally verify the CLI from a global installation and from the local development environment. All steps MUST pass. No `it.todo()` tests may remain.
+All steps MUST pass. No `it.todo()` tests may remain.
 
 ---
 
 ## Changes
 
-This section summarises the changes to be made in this iteration.
+This section summarises the changes made in this iteration.
 
-- Step 1 / 8 — Verify provider contract availability
-- Step 2 / 8 — Add config constants
-- Step 3 / 8 — Reshape config types and defaults
-- Step 4 / 8 — Extract WorkspaceContext and add fsRecords
-- Step 5 / 8 — Extract createConfig and createContext factories
-- Step 6 / 8 — Update CLI entry and commands
-- Step 7 / 8 — Replace findRecordFiles with fsRecords
-- Step 8 / 8 — Commit `refactor-config-options`
+- Step 1 / 8 — Verify provider contract availability — **shipped**
+- Step 2 / 8 — Add config constants — **shipped**
+- Step 3 / 8 — Reshape config types and defaults — **shipped**
+- Step 4 / 8 — Extract WorkspaceContext and add fsRecords — **shipped**
+- Step 5 / 8 — Extract createConfig and createContext factories — **shipped**
+- Step 6 / 8 — Update CLI entry and commands — **shipped**
+- Step 7 / 8 — Replace findRecordFiles with fsRecords — **shipped** for discovery, content, and the checkout loader; the `repository`, `namespace`, `project`, and `package` extraction moved to `migrate-record-kinds-to-facade.md`
+- Step 8 / 8 — Commit `refactor-config-options` — **shipped** as `102e828`
 
 ## Steps
 
-This section contains the detailed steps to execute, including commit steps.
+This section records the executed steps. All steps shipped in commit `refactor-config-options` (`102e828`, `COMMITTED`, pushed).
 
-### Step `1 / 8` — Verify provider contract availability
-
-Confirm that `@art-lib/fs-records` exposes the boundary this iteration consumes. Read the package exports from `$ART_LIB/libs/fs-records/src/index.ts` and confirm the following are exported:
-
-- `FSRecordsAdapter` (interface) — `options`, `discoverRecordFiles(kinds?)`, `createContentSource(file)`
-- `FSRecordsAdapterOptions` (interface) — `basePath`, `patterns`
-- `FSRecordsPattern` (interface)
-- `createFSRecordsAdapter(options: FSRecordsAdapterOptions): FSRecordsAdapter` (factory)
-- `FSContentSource` (interface) — the `ArtContentSource` implementation, one per file
-- `FSRecordFile` with the `basePath` field (renamed from `searchPath`)
-
-Confirm both units against the plan `$ART_LIB/_backlog/4-next/plan-add-fs-records-adapter/plan.md`:
-
-```ts
-export interface FSRecordsAdapter {
-  readonly options: FSRecordsAdapterOptions;
-  discoverRecordFiles(kinds?: string | string[]): Promise<FSRecordFile[]>;
-  createContentSource(file: FSRecordFile): FSContentSource;
-}
-
-export interface FSContentSource extends ArtContentSource {
-  readonly type: 'fs';
-  readonly file: FSRecordFile;
-}
-```
-
-Notes:
-
-- The **adapter is not an `ArtContentSource`**: a content source addresses one file (`uri`, `maybeContent`, `readContent(): Promise<string>`, `writeContent(content): Promise<void>`); the adapter spans a search tree and hands out one source per file. The whiteboard layering bullet still reads the older way — the plan it links is authoritative.
-- Discovery tolerates, content is strict: `discoverRecordFiles()` never throws for a single bad file — it returns that file with `error?` populated. **Filter on `FSRecordFile.error?` before calling `readContent()`.**
-- `discoverRecordFiles()` returns files sorted ascending by absolute path (explicit contract).
-- Do **not** verify against the published `@art-lib/fs-records@0.0.1`: it still exports the pre-rename surface (`findRecordFiles`, `FSRecordsConfig`, `FSRecordsPath`, `FSRecordFile.searchPath`) and has no adapter at all. Verify against the package source once iterations 1–3 of `plan-add-fs-records-adapter` land.
-- The adapter owns discovery and persistence only. Record extraction and serialisation belong to the `@art-js/records` facade (`extractRecords`, `writeRecord`) — there is no `readRecord` and no `writeRecord(file, record, recordWrite)` at this boundary.
-- `ArtContentSource` / `ArtDocumentSource` are imported straight from `@art-md/primitives@0.0.3`.
-
-If any of these symbols are missing or the boundary differs, **REPORT A BLOCKER** — this iteration consumes the adapter iterations in `$ART_LIB/_backlog/4-next/plan-add-fs-records-adapter/plan.md`.
-
-### Step `2 / 8` — Add config constants
-
-Create `$ART_WORKS/cli/workspace/src/config/constants.ts` with two exported constants:
-
-```ts
-import type { FSRecordsPattern, FSRecordsAdapterOptions } from '@art-lib/fs-records';
-
-export const DEFAULT_RECORDS_PATTERN: FSRecordsPattern = {
-  base: '.',
-  pattern: '*.art',
-  ignored: ['node_modules/', '.git/', 'dist/'],
-  excluded: [],
-  gitignore: true,
-};
-
-export const DEFAULT_RECORDS_STORE_OPTIONS: FSRecordsAdapterOptions = {
-  path: '_records/',
-  extension: '.art',
-  ignored: ['node_modules/', '.git/', 'dist/'],
-  excluded: [],
-};
-```
-
-The `DEFAULT_RECORDS_PATTERN` is extracted from the current `DEFAULTS` constant in `$ART_WORKS/cli/workspace/src/config/private/normalizeRecordPaths.ts`.
-
-### Step `3 / 8` — Reshape config types and defaults
-
-Update `$ART_WORKS/cli/workspace/src/config/types.ts` to the new shape:
-
-```ts
-import type { FSRecordsPattern, FSRecordsAdapterOptions } from '@art-lib/fs-records';
-
-export interface WorkspaceConfig {
-  root: { path: string };
-  checkouts: { path: string };
-  data: {
-    store: FSRecordsAdapterOptions;
-    template: string; // WIP: purpose to be defined (default record template path?)
-  };
-  discover: {
-    records: { paths: FSRecordsPattern[] };
-  };
-}
-
-export interface PartialWorkspaceConfig {
-  root?: Partial<WorkspaceConfig['root']>;
-  checkouts?: Partial<WorkspaceConfig['checkouts']>;
-  data?: Partial<WorkspaceConfig['data']>;
-  discover?: {
-    records?: { defaults?: Partial<FSRecordsPattern>; paths?: Partial<FSRecordsPattern>[] };
-  };
-}
-```
-
-Note: the `clone` and `output` keys are removed from `WorkspaceConfig` per the target shape. Update all consumers accordingly.
-
-Streamline `$ART_WORKS/cli/workspace/src/config/private/normalizeRecordPaths.ts` to accept the new `discover.records` shape and use `DEFAULT_RECORDS_PATTERN`:
-
-```ts
-const maybePaths = records?.paths;
-const paths = maybePaths ? maybePaths : [{}];
-```
-
-Update `$ART_WORKS/cli/workspace/src/config/defineConfig.ts`:
-
-- Change `clone` => `checkouts` (config key). `checkouts.path` replaces `clone.path`.
-- Change `records.paths` => `discover.records.paths`.
-- Change `checkouts.path` => `data.store`, defaulting to `DEFAULT_RECORDS_STORE_OPTIONS`.
-- Move `checkouts.template` => `data.template`.
-- Remove the `output` key.
-
-Update `$ART_WORKS/cli/workspace/src/config/loadWorkspaceConfig.ts` so its `DEFAULT_CONFIG` uses the new shape.
-
-### Step `4 / 8` — Extract WorkspaceContext and add fsRecords
-
-Extract the `WorkspaceContext` interface from `$ART_WORKS/cli/workspace/src/private/context/createWorkspaceContext.ts` into a new file `$ART_WORKS/cli/workspace/src/private/context/types.ts`:
-
-```ts
-import type { FSRecordsAdapter } from '@art-lib/fs-records';
-import type { CheckoutStore } from '../store/types';
-
-export interface WorkspaceContext {
-  store: CheckoutStore;
-  fsRecords: FSRecordsAdapter;
-}
-```
-
-Update `createWorkspaceContext` in `$ART_WORKS/cli/workspace/src/private/context/createWorkspaceContext.ts` to receive `(config, store, fsRecords, log)` and return the `WorkspaceContext` from `types.ts`.
-
-### Step `5 / 8` — Extract createConfig and createContext factories
-
-Create `$ART_WORKS/cli/workspace/src/private/cli/createConfig.ts`:
-
-```ts
-async function createConfig(logger: Logger) {
-  logger(createGenericOperation('locate-config'));
-  // WIP: Config discovery next.
-  logger(createGenericOperation('load-config'));
-  return await loadWorkspaceConfig(root);
-}
-```
-
-Create `$ART_WORKS/cli/workspace/src/private/cli/createContext.ts`:
-
-```ts
-createContext(config, logger) {
-  logger(createGenericOperation('create-context'));
-  const store = createCheckoutStore();
-  const log = createOperationsLog(logger);
-  const fsRecords = createFSRecordsAdapter(config.data.store);
-  return createWorkspaceContext(config, store, fsRecords, log);
-}
-```
-
-### Step `6 / 8` — Update CLI entry and commands
-
-Update `$ART_WORKS/cli/workspace/src/index.ts` to use `createConfig()` and `createContext()` instead of building config and context inline. Update all commands (sanity, branch, checkouts, clone, link, publish, pull, push, repo, sync, unlink) to use the context returned by `createContext()`.
-
-### Step `7 / 8` — Replace findRecordFiles with fsRecords
-
-Replace direct `findRecordFiles()` calls with `fsRecords.discoverRecordFiles()` for discovery, `fsRecords.createContentSource(file).readContent()` for content, and the `@art-js/records` facade for extraction:
-
-- `$ART_WORKS/cli/workspace/src/private/resources/checkout/loadCheckoutRecords.ts`
-- `$ART_WORKS/cli/workspace/src/private/resources/repository/loadRepositoryRecords.ts`
-
-Change all discovery invocations of `findRecordFiles()` to use the discovery config (`discover.records`):
-
-- `$ART_WORKS/cli/workspace/src/private/resources/project/loadProjectRecords.ts`
-- `$ART_WORKS/cli/workspace/src/private/resources/namespace/loadNamespaceRecords.ts`
-- `$ART_WORKS/cli/workspace/src/private/resources/package/loadPackageRecords.ts`
-
-### Step `8 / 8` — Commit `refactor-config-options`
+- Step `1 / 8` — Provider contract verified against `@art-lib/fs-records` (adapter surface, `FSRecordFile.basePath`, discovery-tolerates/content-strict). The old `0.0.1` verification warning and the `extractRecords`/`writeRecord` naming note are retired: extraction reads through `createRecordsDocument` as shown in `checkout/loadCheckoutRecords.ts`.
+- Step `2 / 8` — `$PACKAGE/src/config/constants.ts` added with `DEFAULT_RECORDS_PATTERN` and `DEFAULT_RECORDS_STORE_OPTIONS`.
+- Step `3 / 8` — `WorkspaceConfig` reshaped to `root`, `checkouts`, `data.store`, `discover.records.paths`; `clone` and `output` removed; `normalizeRecordPaths.ts`, `defineConfig.ts`, and `loadWorkspaceConfig.ts` updated.
+- Step `4 / 8` — `WorkspaceContext` extracted to `$PACKAGE/src/private/context/types.ts` with `fsRecords: FSRecordsAdapter`; `createWorkspaceContext` receives `(config, store, fsRecords, log)`.
+- Step `5 / 8` — `createConfig` and `createContext` extracted to `$PACKAGE/src/private/cli/`.
+- Step `6 / 8` — `$PACKAGE/src/index.ts` and all commands consume `createContext()`.
+- Step `7 / 8` — Discovery via `fsRecords.discoverRecordFiles()` and content via `createContentSource(file).readContent()` across all five loaders; checkout extraction via the facade (`loadCheckoutRecords.ts`, `upsertCheckoutRecord.ts`). Remaining: the four-kind extraction → `migrate-record-kinds-to-facade.md`.
+- Step `8 / 8` — Committed and pushed as `refactor-config-options` (`102e828`).
 
 ---
 
@@ -310,9 +150,9 @@ This section describes how to confirm the iteration is completed and ready for b
 
 **Instructions:**
 
-- Verify that commits have been executed and pushed (or not pushed) according to the commit's policy.
+- Verify that the commit has been executed and pushed (or not pushed) according to the commit's policy.
 - Verify that `WorkspaceConfig` uses the new shape (`root`, `checkouts`, `data.store`, `discover.records.paths`) and that no references to `clone`, `records.paths`, or `output` remain in the config layer.
 - Verify that `WorkspaceContext` exposes `fsRecords: FSRecordsAdapter` and that all commands consume the context from `createContext()`.
-- Verify that no direct `findRecordFiles()` calls remain; discovery goes through `fsRecords.discoverRecordFiles()`, content through `fsRecords.createContentSource(file).readContent()`, and extraction through the `@art-js/records` facade.
+- Verify that no direct `findRecordFiles()` calls remain; discovery goes through `fsRecords.discoverRecordFiles()`, content through `fsRecords.createContentSource(file).readContent()`, and checkout extraction through `createRecordsDocument`. The four-kind extraction is tracked by `migrate-record-kinds-to-facade.md`, not here.
 - Execute the **Verifying Completion** step as defined in the "Operating Instructions" section.
 - Report according to the "How to Report Back to the Delegator" instructions.
