@@ -145,6 +145,13 @@ describe('loadWorkspaceConfig', () => {
 	it('WHEN the manifest fails to bundle it reports the manifest path', async () => {
 		const tempDir = makeTempDir(tempDirs);
 		writeFileSync(join(tempDir, '.art-workspace.mts'), 'export default {{{');
+		// esbuild's service child writes the formatted parse error to inherited stderr
+		// before throwing; console/stderr spies cannot intercept it. Simulate the
+		// rejection instead — real bundling is covered by @art-lib/config's tests,
+		// and the `logLevel: 'silent'` root fix is tracked in Art Lib's parking lot.
+		compileMock.mockRejectedValueOnce(
+			new Error('Build failed with 1 error: Expected identifier but found "{"'),
+		);
 
 		await expect(loadWorkspaceConfig(tempDir)).rejects.toThrow(/\.art-workspace\.mts/);
 	});
