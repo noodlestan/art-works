@@ -2,7 +2,7 @@
 
 **ID:** `fix-pull-checkout-test`
 
-**Status:** `WORKING`
+**Status:** `DONE`
 
 **Template:** `$DOMAINS/plans/templates/plan.tart`
 
@@ -101,10 +101,10 @@ Execution occurs from `$WORKSPACE/`; project work happens in `$WORKSPACE/checkou
 
 ## Items:
 
-| Iteration / Instructions                            | Status  |
-| --------------------------------------------------- | ------- |
-| Iteration: Assert Git Pull Error `inlined`          | `DONE`  |
-| Iteration: Silence Bundle Failure Fixture `inlined` | `READY` |
+| Iteration / Instructions                            | Status |
+| --------------------------------------------------- | ------ |
+| Iteration: Assert Git Pull Error `inlined`          | `DONE` |
+| Iteration: Silence Bundle Failure Fixture `inlined` | `DONE` |
 
 ### Iteration: Assert Git Pull Error
 
@@ -213,7 +213,9 @@ test(workspace-cli): Assert git-pull error in pullCheckout failure path.
 
 **Id:** `silence-bundle-fixture-noise`
 
-**Status:** `READY`
+**Status:** `DONE`
+
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e523d2e04ffeE0iXdbkb0UosaR`) since `2026-11-05T22:09:03Z`; reported in chat, no report file.
 
 **Purpose:** Stop the deliberate malformed-manifest fixture from streaming esbuild's parse error into CI output while keeping its manifest-path assertion green.
 
@@ -229,9 +231,9 @@ test(workspace-cli): Assert git-pull error in pullCheckout failure path.
 
 #### Commits:
 
-| ID                             | Repository / Checkout / Branch  | Policy       | Hash  | Status     |
-| ------------------------------ | ------------------------------- | ------------ | ----- | ---------- |
-| `silence-bundle-fixture-noise` | Art Works / `$PROJECT` / `main` | `AUTONOMOUS` | (TBD) | `AUTHORED` |
+| ID                             | Repository / Checkout / Branch  | Policy       | Hash      | Status      |
+| ------------------------------ | ------------------------------- | ------------ | --------- | ----------- |
+| `silence-bundle-fixture-noise` | Art Works / `$PROJECT` / `main` | `AUTONOMOUS` | `2894672` | `COMMITTED` |
 
 **Instructions:**
 
@@ -327,7 +329,7 @@ test(workspace-cli): Silence bundle-failure fixture stderr noise.
 
 ### Next
 
-Delegate iteration `silence-bundle-fixture-noise` to a worker, then integrate.
+Both iterations DONE — move this plan out of `3-now` and record the backlog transition.
 
 ### Blockers
 
@@ -361,6 +363,7 @@ Delegate iteration `silence-bundle-fixture-noise` to a worker, then integrate.
 - **Malformed config** — the compiler reports `Expected identifier but found "{"` at `art-repo-record-test-rzyHH1/.art-workspace.mts:1:16` (under `/private/tmp/`), first line `export default {{{`.
 - **Config compilation** — `Package Dependency: ESBuild` — "Workspace configs are expressed in `.mts` modules and need to be compiled by CLI", so a broken fixture surfaces as exactly this diagnostic.
 - **Tightened assertion shipped** — `rejects.toThrow('Could not read from remote repository.')` committed as `6d1cfcd` and pushed to `origin/main`; file run 2/2 green and package suite 373/373 green after the change.
+- **CI emission silenced** — one-shot `compileMock.mockRejectedValueOnce(...)` in the bundle-failure test, committed as `2894672` and pushed; `npm run test` in `$PACKAGE` exits 0 with zero `[ERROR]` blocks (89 files / 373 tests) and `npm run ci` from `$WORKSPACE` passes.
 
 ### Findings
 
