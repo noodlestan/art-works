@@ -103,14 +103,16 @@ Execution occurs from `$WORKSPACE/`; project work happens in `$WORKSPACE/checkou
 
 | Iteration / Instructions                            | Status  |
 | --------------------------------------------------- | ------- |
-| Iteration: Assert Git Pull Error `inlined`          | `READY` |
+| Iteration: Assert Git Pull Error `inlined`          | `DONE`  |
 | Iteration: Silence Bundle Failure Fixture `inlined` | `READY` |
 
 ### Iteration: Assert Git Pull Error
 
 **Id:** `assert-pull-error`
 
-**Status:** `READY`
+**Status:** `DONE`
+
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e536aefcaffeWhO35xIwvrp5FV`) since `2026-11-05T00:50:46Z`; reported in chat, no report file.
 
 **Purpose:** Make the `WHEN the pull fails it throws` test prove the failure comes from git mechanics, so an unrelated throw (e.g. a config-parse error) can never satisfy it.
 
@@ -126,9 +128,9 @@ Execution occurs from `$WORKSPACE/`; project work happens in `$WORKSPACE/checkou
 
 #### Commits:
 
-| ID                  | Repository / Checkout / Branch  | Policy       | Hash  | Status     |
-| ------------------- | ------------------------------- | ------------ | ----- | ---------- |
-| `assert-pull-error` | Art Works / `$PROJECT` / `main` | `AUTONOMOUS` | (TBD) | `AUTHORED` |
+| ID                  | Repository / Checkout / Branch  | Policy       | Hash      | Status      |
+| ------------------- | ------------------------------- | ------------ | --------- | ----------- |
+| `assert-pull-error` | Art Works / `$PROJECT` / `main` | `AUTONOMOUS` | `6d1cfcd` | `COMMITTED` |
 
 **Instructions:**
 
@@ -325,7 +327,7 @@ test(workspace-cli): Silence bundle-failure fixture stderr noise.
 
 ### Next
 
-Delegate iteration `assert-pull-error` to a worker, then integrate; after it lands, delegate `silence-bundle-fixture-noise`.
+Delegate iteration `silence-bundle-fixture-noise` to a worker, then integrate.
 
 ### Blockers
 
@@ -358,6 +360,7 @@ Delegate iteration `assert-pull-error` to a worker, then integrate; after it lan
 - **Green failure-path test** — `WHEN the pull fails it throws` passes (500ms) in the same run where the config error appears.
 - **Malformed config** — the compiler reports `Expected identifier but found "{"` at `art-repo-record-test-rzyHH1/.art-workspace.mts:1:16` (under `/private/tmp/`), first line `export default {{{`.
 - **Config compilation** — `Package Dependency: ESBuild` — "Workspace configs are expressed in `.mts` modules and need to be compiled by CLI", so a broken fixture surfaces as exactly this diagnostic.
+- **Tightened assertion shipped** — `rejects.toThrow('Could not read from remote repository.')` committed as `6d1cfcd` and pushed to `origin/main`; file run 2/2 green and package suite 373/373 green after the change.
 
 ### Findings
 
@@ -389,3 +392,4 @@ Delegate iteration `assert-pull-error` to a worker, then integrate; after it lan
 - **Commits without `Commit:` sections** — both `#### Commits:` table entries lack the `##### Commit:` section that `$DOMAINS/commits/templates/commit.tart` renders; message and policy live in the instruction steps instead. Rendering completeness only.
 - **Iteration-level `**Dependencies:**` not rendered** — the plan template places it between instructions and commits; the commit steps carry `**Dependencies:** None` instead. No blocking dependencies either way.
 - **Stale working-tree note in both iterations** — the "Before starting" claim of a pre-existing `_backlog/_parking-lot.md` modification no longer holds (`git status` in `$PROJECT` is clean); "stage only the files you changed" stays the operative rule.
+- **Pre-commit hook checks the whole checkout** — it runs `prettier . -c`, so an uncommitted plan edit blocked the worker's commit during `assert-pull-error`; format plan status edits with `npx prettier --write` before delegating.
