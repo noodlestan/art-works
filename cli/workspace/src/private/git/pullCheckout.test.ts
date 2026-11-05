@@ -34,6 +34,8 @@ describe('pullCheckout', () => {
 		const dir = makeTempDir(tempDirs);
 		await makeGitRepo(tempDirs, { commit: true, dir });
 
-		await expect(pullCheckout(dir, 'main')).rejects.toBeTruthy();
+		await expect(pullCheckout(dir, 'main')).rejects.toThrow(
+			'Could not read from remote repository.',
+		);
 	});
 });
