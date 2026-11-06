@@ -1,18 +1,22 @@
+import type {
+	OperationBase as SharedOperationBase,
+	OperationOutcome as SharedOperationOutcome,
+} from '@art-lib/operations/model';
+
 import type { Checkout } from '../store/createCheckout.js';
 
 export type CheckoutOp =
 	'clone' | 'push' | 'pull' | 'publish' | 'branch' | 'linked' | 'unlink' | 'run';
 
-export type OperationOutcome = 'pending' | 'success' | 'failure';
+export type OperationOutcome = SharedOperationOutcome;
 
-export interface OperationBase {
-	operation: string;
+export interface OperationBase extends Omit<
+	SharedOperationBase,
+	'ts' | 'finishedTs' | 'level' | 'text'
+> {
 	ts: Date; // created when the pending op is logged
 	finishedTs?: Date; // set when the op resolves (success/failure)
-	checkout?: Checkout;
-	outcome: OperationOutcome;
-	message: () => string;
-	timing: () => number; // finishedTs ? finishedTs.getTime() - ts.getTime() : NaN
+	checkout?: Checkout; // CLI presentation: the checkout an operation ran against
 }
 
 export interface OperationPending extends OperationBase {

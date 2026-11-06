@@ -1,3 +1,6 @@
+import { createOperationFailure as createSharedOperationFailure } from '@art-lib/operations/model';
+
+import { toSharedPending } from './toSharedPending.js';
 import type { OperationFailure, OperationPending } from './types.js';
 
 function formatRawError(raw: string): string {
@@ -28,14 +31,15 @@ export function createOperationFailure<T extends OperationPending>(
 	pending: T,
 	error: unknown,
 ): OperationFailure {
-	const rawError = error instanceof Error ? error.message : String(error);
 	const label = errorLabels[pending.operation] ?? 'OperationError';
+	const shared = createSharedOperationFailure(toSharedPending(pending), error, { label });
 
 	return {
 		...pending,
-		outcome: 'failure',
-		finishedTs: new Date(),
-		error: rawError,
+		outcome: shared.outcome,
+		finishedTs: new Date(shared.finishedTs ?? Date.now()),
+		error: shared.error,
+		timing: shared.timing,
 		message() {
 			return extractReason(this.error);
 		},

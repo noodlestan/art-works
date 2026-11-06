@@ -1,3 +1,5 @@
+import { createGenericOperation as createSharedGenericOperation } from '@art-lib/operations/model';
+
 import type { OperationPending } from './types.js';
 
 function formatData(data: unknown): string {
@@ -5,16 +7,16 @@ function formatData(data: unknown): string {
 }
 
 export function createGenericOperation(operation: string, data?: unknown): OperationPending {
+	const shared = createSharedGenericOperation(operation, data);
+
 	return {
-		ts: new Date(),
-		outcome: 'pending',
-		operation,
-		data,
+		ts: new Date(shared.ts),
+		outcome: shared.outcome,
+		operation: shared.operation,
+		data: shared.data,
 		message() {
 			return formatData(data);
 		},
-		timing() {
-			return this.finishedTs ? this.finishedTs.getTime() - this.ts.getTime() : NaN;
-		},
+		timing: shared.timing,
 	};
 }
