@@ -76,7 +76,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Setting Up
 
-**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/setting-up.art`.
+**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/setting-up/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -91,7 +91,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Writing Commit Message
 
-**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/ops/writing-commit-message.art`.
+**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/writing-commit-message/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -101,7 +101,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Verifying Completion
 
-**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/verifying-completion.art`.
+**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/verifying-completion/operation.art`.
 
 **Instructions:** (From `$ART_WORKS/_guide.md`)
 
@@ -137,6 +137,8 @@ Additionally verify the CLI from a global installation and from the local develo
 **Purpose:** Make the intent behind each config option more explicit.
 
 **Description:** Change configuration options to express `checkouts.path`, `data` (where managed records are stored), and `discovery.records` (how records are scanned for in checkouts).
+
+**Instructions Mode:** `INSTRUCTIONS_SELF_CONTAINED_FILE`
 
 **Instructions:** `./plan-art-work-cli-global-install/instructions/refactor-config-semantics.md`
 
@@ -307,6 +309,8 @@ refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
 
 **Description:** Make the CLI discover configuration in current working directory and parent dirs. Compile config file to an `.art` temp directory. Apply default config values if not found. In this scenario: checkouts are assumed at `checkouts` and if repos are added they are stored in `_records/repositories/`. Display configuration on every run.
 
+**Instructions Mode:** `INSTRUCTIONS_SELF_CONTAINED_FILE`
+
 **Instructions:** `./plan-art-work-cli-global-install/instructions/discover-config-location.md`
 
 **Changes:**
@@ -322,11 +326,11 @@ refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
 
 #### Commits:
 
-| ID                           | Repository / Checkout / Branch    | Policy       | Hash | Status        |
-| ---------------------------- | --------------------------------- | ------------ | ---- | ------------- |
-| `discover-config-location`   | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
-| `compile-config-to-temp-dir` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
-| `show-config-options`        | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                           | Repository / Checkout / Branch    | Policy       | Hash | Status     |
+| ---------------------------- | --------------------------------- | ------------ | ---- | ---------- |
+| `discover-config-location`   | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
+| `compile-config-to-temp-dir` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
+| `show-config-options`        | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
 
 ##### Commit: `discover-config-location`
 
@@ -362,6 +366,8 @@ build(art-workspace-cli): Show config options.
 
 **Description:** Add a new `init` command that creates a configuration file with default values for `root.path` and `checkouts.path` redeclared for an easy to use starting point.
 
+**Instructions Mode:** `INSTRUCTIONS_SELF_CONTAINED_FILE`
+
 **Instructions:** `./plan-art-work-cli-global-install/instructions/add-init-command.md`
 
 **Changes:**
@@ -375,9 +381,9 @@ build(art-workspace-cli): Show config options.
 
 #### Commits:
 
-| ID                 | Repository / Checkout / Branch    | Policy       | Hash | Status        |
-| ------------------ | --------------------------------- | ------------ | ---- | ------------- |
-| `add-init-command` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                 | Repository / Checkout / Branch    | Policy       | Hash | Status     |
+| ------------------ | --------------------------------- | ------------ | ---- | ---------- |
+| `add-init-command` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
 
 ##### Commit: `add-init-command`
 
@@ -397,6 +403,8 @@ build(art-workspace-cli): Add Init Command.
 
 **Description:** Update architecture docs, guides, and any knowledge files in `$ART_WORKS` that describe how the CLI locates configuration, operates in global vs local modes, and the shape of the workspace config.
 
+**Instructions Mode:** `INSTRUCTIONS_SELF_CONTAINED_FILE`
+
 **Instructions:** `./plan-art-work-cli-global-install/instructions/update-art-work-knowledge.md`
 
 **Changes:**
@@ -412,9 +420,9 @@ build(art-workspace-cli): Add Init Command.
 
 #### Commits:
 
-| ID                          | Repository / Checkout / Branch    | Policy       | Hash | Status        |
-| --------------------------- | --------------------------------- | ------------ | ---- | ------------- |
-| `update-art-work-knowledge` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `PLACEHOLDER` |
+| ID                          | Repository / Checkout / Branch    | Policy       | Hash | Status     |
+| --------------------------- | --------------------------------- | ------------ | ---- | ---------- |
+| `update-art-work-knowledge` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
 
 ##### Commit: `update-art-work-knowledge`
 
@@ -466,6 +474,6 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Feedback
 
-- **Missing `**Instructions Mode:**`** on iterations `refactor-config-semantics`, `discover-config-location`, `add-init-command`, and `update-art-work-knowledge` (all carry instruction file paths; only `migrate-record-kinds-to-facade` declares the mode). Delegating-record completeness only.
+- **Missing `**Instructions Mode:**`** on iterations `refactor-config-semantics`, `discover-config-location`, `add-init-command`, and `update-art-work-knowledge` — **resolved**: all five iterations now declare `INSTRUCTIONS_SELF_CONTAINED_FILE`. Delegating-record completeness only.
 - **Template sections not rendered** — no `### (Scope) Package: Art Workspace Cli`, `## Execution Context`, `## Resource Kinds in Scope`, or `## Workflows`; the header lacks `**Has Context File:**`; Upstream Work, Required Skills, and Domains are tables where the work-item templates render bullet lists. Plan rendering only; workers enter through self-contained instruction files.
-- **Stale operation paths in Operating Instructions** — the Purpose lines point at `$DOMAINS/work/workflows/{planning-work,executing-work}/ops/*.art`, which do not exist; the real definitions live at `writing-commit-message/operation.art`, `setting-up/operation.art`, and `verifying-completion/operation.art` (the instruction file already links them correctly).
+- **Stale operation paths in Operating Instructions** — the Purpose lines pointed at `$DOMAINS/work/workflows/{planning-work,executing-work}/ops/*.art`, which do not exist; the real definitions live at `writing-commit-message/operation.art`, `setting-up/operation.art`, and `verifying-completion/operation.art`. **Resolved**: the plan's Purpose lines and every instruction file now use the `operation.art` layout.

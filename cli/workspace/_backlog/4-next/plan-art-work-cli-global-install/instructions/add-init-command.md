@@ -61,7 +61,7 @@ This section lists the documentation and reference files the sub-agent needs to 
 
 ### Setting Up
 
-**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/setting-up.art`.
+**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/setting-up/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -76,7 +76,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Writing Commit Message
 
-**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/ops/writing-commit-message.art`.
+**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/writing-commit-message/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -85,7 +85,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Verifying Completion
 
-**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/verifying-completion.art`.
+**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/verifying-completion/operation.art`.
 
 **Instructions:** (From `$ART_WORKS/_guide.md`)
 

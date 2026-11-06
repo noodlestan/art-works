@@ -25,11 +25,11 @@ This section describes how to report back to the delegator after completing the 
 
 ## Path Variables
 
-| Variable     | Resolved Path                | Purpose                                                        |
-| ------------ | ---------------------------- | -------------------------------------------------------------- |
-| `$WORKSPACE` | Current working directory    | Workspace root directory                                       |
-| `$DOMAINS`   | `$WORKSPACE/.agents/domains` | Domain resources directory                                     |
-| `$ART_WORKS` | Provided with prompt         | Art Work repository. Example: `$WORKSPACE/checkouts/art-works` |
+| Variable     | Resolved Path                    | Purpose                                           |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| `$WORKSPACE` | Current working directory        | Workspace root directory                          |
+| `$DOMAINS`   | `$WORKSPACE/.agents/domains`     | Domain resources directory                        |
+| `$ART_WORKS` | `$WORKSPACE/checkouts/art-works` | Art Works repository; hosts this plan and package |
 
 ## Working Agreements
 
@@ -61,7 +61,7 @@ This section lists the documentation and reference files the sub-agent needs to 
 
 ### Setting Up
 
-**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/setting-up.art`.
+**Purpose:** Prepare the execution environment. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/setting-up/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -76,7 +76,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Writing Commit Message
 
-**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/ops/writing-commit-message.art`.
+**Purpose:** Write standardized message according to context conventions. Operation of Workflow: Planning Work, defined in `$DOMAINS/work/workflows/planning-work/writing-commit-message/operation.art`.
 
 **Instructions:** (From `$WORKSPACE/_guide.md`)
 
@@ -85,7 +85,7 @@ If any of these fail, resolve the issue before proceeding with implementation. D
 
 ### Verifying Completion
 
-**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/ops/verifying-completion.art`.
+**Purpose:** Confirms that the work item has been completed and satisfies its intended outcome. Operation of Workflow: Executing Work, defined in `$DOMAINS/work/workflows/executing-work/verifying-completion/operation.art`.
 
 **Instructions:** (From `$ART_WORKS/_guide.md`)
 
@@ -108,7 +108,7 @@ This section summarises the changes to be made in this iteration.
 
 - Step 1 / 4 — Discover configuration by scanning parent dirs
 - Step 2 / 4 — Commit `discover-config-location`
-- Step 3 / 4 — Compile config to a hidden `.art` dir and show config options
+- Step 3 / 4 — Feed the shipped bundle cache and show config options
 - Step 4 / 4 — Commit `compile-config-to-temp-dir` and `show-config-options`
 
 ## Steps
@@ -142,9 +142,9 @@ build(art-workspace-cli): Discover configuration file.
 
 ---
 
-### Step `3 / 4` — Compile config to a hidden `.art` dir and show config options
+### Step `3 / 4` — Feed the shipped bundle cache and show config options
 
-Extend the config loading so that the discovered config file is compiled to a hidden `.art` temp directory (reusing the existing esbuild bundling approach in `$ART_WORKS/cli/workspace/src/config/loadWorkspaceConfig.ts`).
+Compilation already ships: `loadWorkspaceConfig.ts` bundles the manifest with esbuild into the `node_modules/.art-workspace` cache (reuse/rebuild logging, `--no-config-cache` bypass, legacy `.art-workspace-bundle.mjs` cleanup). **Do not introduce a second temp/compile location.** The remaining work here is to feed that loader with the Step 1 discovery result — the discovered manifest path becomes the config root — and to keep the existing config-cache tests green.
 
 Advertise the active configuration on every run:
 
@@ -187,7 +187,7 @@ This section describes how to confirm the iteration is completed and ready for b
 
 - Verify that commits have been executed and pushed (or not pushed) according to the commit's policy.
 - Verify that the CLI discovers the config file by scanning the current working directory and parent directories, and falls back to defaults when none is found.
-- Verify that the config file is compiled to a hidden `.art` temp directory.
+- Verify that the discovered config flows through the shipped esbuild bundle cache (`node_modules/.art-workspace`) with no second compile location introduced.
 - Verify that the CLI advertises `running without config` or `Running from config at {path}` on every run.
 - Execute the **Verifying Completion** step as defined in the "Operating Instructions" section.
 - Report according to the "How to Report Back to the Delegator" instructions.
