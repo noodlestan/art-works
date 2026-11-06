@@ -88,6 +88,29 @@ This repository hosts also backlogs for:
 
 - `cli/workspace/`
 
+## Global Install Usage
+
+The Art Workspace Cli (`@art-works/workspace-cli`) behaves the same from a global installation as from a local one: configuration is discovered from the current working directory upward, never from the CLI's install location.
+
+### Run from a global installation
+
+```bash
+npm install -g @art-works/workspace-cli
+
+art-workspace-cli init # in the workspace root: create `.art-workspace.mts`
+art-workspace-cli sanity # from any directory inside the workspace
+```
+
+Each command walks up from the current directory to the first `.art-workspace.mts` and runs against that config root. Without a manifest anywhere in the chain, the CLI falls back to the default config rooted at the current directory.
+
+### Set up a fresh workspace
+
+`art-workspace-cli init` writes `.art-workspace.mts` with the default values (`checkouts.path`, `data.store`, `discover.records`) into the current directory and refuses to overwrite an existing manifest. The manifest is a plain default export, so a freshly initialised workspace loads it without a local `node_modules`.
+
+### Run from a local checkout
+
+From this repository, build with `npm run build` in `cli/workspace` and run `node dist/index.mjs <command>`. Discovery and config semantics are identical to the global installation.
+
 ## Operating Instructions
 
 ### Operating Instructions: Setting Up
