@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `migrate-record-kinds-to-facade` is `DONE` at `cc3b7fc` (report landed next to its instruction file). Delegate `discover-config-location` next; then `add-init-command` and `update-art-work-knowledge`, in order.
+- `discover-config-location` is `WORKING` — delegated to a worker; integrate its report on return, then `add-init-command` and `update-art-work-knowledge`, in order.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status  |
-| ----------------------------------------- | ------- |
-| Iteration: Refactor Config Semantics      | `DONE`  |
-| Iteration: Migrate Record Kinds to Facade | `DONE`  |
-| Iteration: Discover configuration file    | `READY` |
-| Iteration: Add Init command               | `READY` |
-| Iteration: Update Art Work Knowledge      | `READY` |
+| Iteration / Instructions                  | Status    |
+| ----------------------------------------- | --------- |
+| Iteration: Refactor Config Semantics      | `DONE`    |
+| Iteration: Migrate Record Kinds to Facade | `DONE`    |
+| Iteration: Discover configuration file    | `WORKING` |
+| Iteration: Add Init command               | `READY`   |
+| Iteration: Update Art Work Knowledge      | `READY`   |
 
 ### Iteration: Refactor Config Semantics
 
@@ -303,7 +303,9 @@ refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
 
 **Id:** `discover-config-location`
 
-**Status:** `READY`
+**Status:** `WORKING`
+
+**Delegation:** `WORKING` — worker `agent-worker` (`ses_e51182387ffei3iwMel3s7bpy1`) since `2026-11-06T03:29:37Z`.
 
 **Purpose:** Make the Art Workspace Cli execute independently of its source checkout when installed globally.
 
