@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `discover-config-location` is `DONE` at `1123faa` + `ac0337a` + `e0fbe90` (report landed next to its instruction file). Delegate `add-init-command` next; then `update-art-work-knowledge`.
+- `add-init-command` is `WORKING` — delegated to a worker; integrate its report on return, then `update-art-work-knowledge`.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status  |
-| ----------------------------------------- | ------- |
-| Iteration: Refactor Config Semantics      | `DONE`  |
-| Iteration: Migrate Record Kinds to Facade | `DONE`  |
-| Iteration: Discover configuration file    | `DONE`  |
-| Iteration: Add Init command               | `READY` |
-| Iteration: Update Art Work Knowledge      | `READY` |
+| Iteration / Instructions                  | Status    |
+| ----------------------------------------- | --------- |
+| Iteration: Refactor Config Semantics      | `DONE`    |
+| Iteration: Migrate Record Kinds to Facade | `DONE`    |
+| Iteration: Discover configuration file    | `DONE`    |
+| Iteration: Add Init command               | `WORKING` |
+| Iteration: Update Art Work Knowledge      | `READY`   |
 
 ### Iteration: Refactor Config Semantics
 
@@ -362,7 +362,9 @@ build(art-workspace-cli): Show config options.
 
 **Id:** `add-init-command`
 
-**Status:** `READY`
+**Status:** `WORKING`
+
+**Delegation:** `WORKING` — worker `agent-worker` (`ses_e4f822881ffe4R2HWTqIUtiM7y`) since `2026-11-06T10:53:01Z`.
 
 **Purpose:** Make the Art Workspace Cli executable independently of its source checkout when installed globally.
 
