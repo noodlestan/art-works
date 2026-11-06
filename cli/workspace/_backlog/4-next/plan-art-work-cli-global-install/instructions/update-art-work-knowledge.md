@@ -25,11 +25,11 @@ This section describes how to report back to the delegator after completing the 
 
 ## Path Variables
 
-| Variable     | Resolved Path                | Purpose                                                        |
-| ------------ | ---------------------------- | -------------------------------------------------------------- |
-| `$WORKSPACE` | Current working directory    | Workspace root directory                                       |
-| `$DOMAINS`   | `$WORKSPACE/.agents/domains` | Domain resources directory                                     |
-| `$ART_WORKS` | Provided with prompt         | Art Work repository. Example: `$WORKSPACE/checkouts/art-works` |
+| Variable     | Resolved Path                    | Purpose                                           |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| `$WORKSPACE` | Current working directory        | Workspace root directory                          |
+| `$DOMAINS`   | `$WORKSPACE/.agents/domains`     | Domain resources directory                        |
+| `$ART_WORKS` | `$WORKSPACE/checkouts/art-works` | Art Works repository; hosts this plan and package |
 
 ## Working Agreements
 
@@ -43,7 +43,7 @@ The plan workflow (see the entry point guide → Planning Workflow → Working T
 
 This section describes the goal(s) of this iteration.
 
-Update Art Work knowledge files to reflect the global-install capability and the new configuration semantics, documenting how the CLI locates configuration, operates in global vs local modes, and the shape of the workspace config.
+Update the Art Works knowledge files to reflect the global-install capability and the new configuration semantics, documenting how the CLI locates configuration, operates in global vs local modes, and the shape of the workspace config.
 
 ## Mandatory Reading
 
@@ -124,7 +124,7 @@ Use only the new config names (`checkouts`, `data.store`, `discover.records`) �
 
 ### Step `2 / 3` — Update config README
 
-Update `$ART_WORKS/cli/workspace/src/config/README.md` (or create it if it does not exist) describing the config file format and discovery: the manifest file name, the discovery process (current dir and parents), the compile-to-`.art`-temp-dir behaviour, and the default config values.
+Update `$ART_WORKS/cli/workspace/src/config/README.md` (or create it if it does not exist) describing the config file format and discovery: the manifest file name (`.art-workspace.mts`), the discovery process (current dir and parents), the shipped bundle-cache behaviour (`node_modules/.art-workspace`, `--no-config-cache` bypass, legacy-bundle cleanup — no second compile location), and the default config values.
 
 ### Step `3 / 3` — Commit `update-art-work-knowledge`
 

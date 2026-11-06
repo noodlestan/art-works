@@ -25,11 +25,11 @@ This section describes how to report back to the delegator after completing the 
 
 ## Path Variables
 
-| Variable     | Resolved Path                | Purpose                                                        |
-| ------------ | ---------------------------- | -------------------------------------------------------------- |
-| `$WORKSPACE` | Current working directory    | Workspace root directory                                       |
-| `$DOMAINS`   | `$WORKSPACE/.agents/domains` | Domain resources directory                                     |
-| `$ART_WORKS` | Provided with prompt         | Art Work repository. Example: `$WORKSPACE/checkouts/art-works` |
+| Variable     | Resolved Path                    | Purpose                                           |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| `$WORKSPACE` | Current working directory        | Workspace root directory                          |
+| `$DOMAINS`   | `$WORKSPACE/.agents/domains`     | Domain resources directory                        |
+| `$ART_WORKS` | `$WORKSPACE/checkouts/art-works` | Art Works repository; hosts this plan and package |
 
 ## Working Agreements
 
@@ -118,7 +118,7 @@ This section contains the detailed steps to execute, including commit steps.
 
 Add a new `init` command to the CLI in `$ART_WORKS/cli/workspace/src/index.ts`. The command must:
 
-- Create a configuration file in the current working directory with default values for `root.path` and `checkouts.path` redeclared for an easy to use starting point.
+- Create a configuration file named `.art-workspace.mts` (the manifest constant in `loadWorkspaceConfig.ts`) in the current working directory with default values for `root.path` and `checkouts.path` redeclared for an easy to use starting point — the name must match what discovery scans for.
 - Use only the new config names (`checkouts`, `data.store`, `discover.records`) — never `clone` or `records`.
 - Follow the same command registration pattern as the existing commands (sanity, branch, checkouts, clone, link, publish, pull, push, repo, sync, unlink).
 
