@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `add-init-command` is `WORKING` — delegated to a worker; integrate its report on return, then `update-art-work-knowledge`.
+- `add-init-command` is `DONE` at `6f1d568` (report landed next to its instruction file). Delegate `update-art-work-knowledge` — the final iteration.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status    |
-| ----------------------------------------- | --------- |
-| Iteration: Refactor Config Semantics      | `DONE`    |
-| Iteration: Migrate Record Kinds to Facade | `DONE`    |
-| Iteration: Discover configuration file    | `DONE`    |
-| Iteration: Add Init command               | `WORKING` |
-| Iteration: Update Art Work Knowledge      | `READY`   |
+| Iteration / Instructions                  | Status  |
+| ----------------------------------------- | ------- |
+| Iteration: Refactor Config Semantics      | `DONE`  |
+| Iteration: Migrate Record Kinds to Facade | `DONE`  |
+| Iteration: Discover configuration file    | `DONE`  |
+| Iteration: Add Init command               | `DONE`  |
+| Iteration: Update Art Work Knowledge      | `READY` |
 
 ### Iteration: Refactor Config Semantics
 
@@ -362,9 +362,9 @@ build(art-workspace-cli): Show config options.
 
 **Id:** `add-init-command`
 
-**Status:** `WORKING`
+**Status:** `DONE`
 
-**Delegation:** `WORKING` — worker `agent-worker` (`ses_e4f822881ffe4R2HWTqIUtiM7y`) since `2026-11-06T10:53:01Z`.
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e4f822881ffe4R2HWTqIUtiM7y`) since `2026-11-06T10:53:01Z`; report `./plan-art-work-cli-global-install/instructions/add-init-command__report.md`.
 
 **Purpose:** Make the Art Workspace Cli executable independently of its source checkout when installed globally.
 
@@ -385,9 +385,9 @@ build(art-workspace-cli): Show config options.
 
 #### Commits:
 
-| ID                 | Repository / Checkout / Branch    | Policy       | Hash | Status     |
-| ------------------ | --------------------------------- | ------------ | ---- | ---------- |
-| `add-init-command` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
+| ID                 | Repository / Checkout / Branch    | Policy       | Hash      | Status      |
+| ------------------ | --------------------------------- | ------------ | --------- | ----------- |
+| `add-init-command` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `6f1d568` | `COMMITTED` |
 
 ##### Commit: `add-init-command`
 
@@ -449,6 +449,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 - Implementation checkpoint `102e828` is pushed. `npm run ci` passes: lint, build, 358 unit tests, and 26 integration tests.
 - Iteration `discover-config-location` landed at `1123faa`, `ac0337a`, `e0fbe90` (pushed): cwd→parent manifest discovery feeds the shipped `node_modules/.art-workspace` bundle cache with no second compile location, the run banner prints `Running from config at {path}` / `running without config`, verified from local dev and an isolated global install; suite 88 unit files / 348 tests + 28 integration green.
+- Iteration `add-init-command` landed at `6f1d568` (pushed): `init` writes `.art-workspace.mts` with the new config shape (no `clone`/`records`), refuses to overwrite an existing manifest, and the generated config is discovered and loaded by a follow-up `sanity` — verified from local dev and an isolated global install; suite 91 files / 381 tests green.
 - `@art-lib/fs-records@0.0.3` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
 - Iteration `migrate-record-kinds-to-facade` landed at `cc3b7fc` (pushed): the four record-kind loaders extract through the `@art-js/records` facade, the legacy `read*Record` parsers are deleted, facade-only greps are clean, and the package suite runs 89 files / 371 tests green with no `it.todo()`.
 
