@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -103,5 +103,27 @@ describe('cli config cache', () => {
 		expect(existsSync(join(root, 'config.bundle.mjs'))).toBe(false);
 		expect(existsSync(join(root, 'config.cache.json'))).toBe(false);
 		expect(existsSync(join(root, '.art-workspace-bundle.mjs'))).toBe(false);
+	});
+
+	it('WHEN run from a nested cwd, the discovered parent config feeds the shipped bundle cache', async () => {
+		const root = await setupWorkspace(tempDirs);
+		trackConfigCacheDir(root);
+		const nested = join(root, 'packages', 'app');
+		mkdirSync(nested, { recursive: true });
+
+		const result = await spawnCli({ args: ['sanity'], cwd: nested });
+
+		expect(result.code).toBe(0);
+		expect(output(result)).not.toContain('not found at');
+		expect(existsSync(join(resolveCacheDir(root), 'config.bundle.mjs'))).toBe(true);
+		expect(existsSync(join(nested, ...CACHE_DIR_SEGMENTS))).toBe(false);
+		expect(existsSync(join(nested, '.art-workspace-bundle.mjs'))).toBe(false);
+		expect(existsSync(join(root, '.art-workspace-bundle.mjs'))).toBe(false);
+
+		const metaPath = join(resolveCacheDir(root), 'config.cache.json');
+		const cacheMeta = JSON.parse(readFileSync(metaPath, 'utf8')) as ConfigCacheMeta;
+
+		// `process.cwd()` reports the symlink-resolved temp path on macOS
+		expect(cacheMeta.manifest).toBe(join(realpathSync(root), MANIFEST_FILE));
 	});
 });
