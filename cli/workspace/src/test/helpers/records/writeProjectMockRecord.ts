@@ -19,7 +19,7 @@ export function writeProjectMockRecord(
 	const namespaces = options?.namespaces ?? [];
 	const nsLines =
 		namespaces.length > 0
-			? '\n**Namespaces:**\n' + namespaces.map(ns => `- Namespace: ${ns}`).join('\n') + '\n'
+			? '\n\n**Namespaces:**\n' + namespaces.map(ns => `- Namespace: ${ns}`).join('\n') + '\n'
 			: '';
 	writeFileSync(
 		join(dir, name.toLowerCase().replace(/\s+/g, '-') + '.art'),
@@ -51,7 +51,7 @@ export function writeNamespaceMockRecord(
 	const packages = options?.packages ?? [];
 	const pkgLines =
 		packages.length > 0
-			? '\n**Packages:**\n' + packages.map(pkg => `- Package: ${pkg}`).join('\n') + '\n'
+			? '\n\n**Packages:**\n' + packages.map(pkg => `- Package: ${pkg}`).join('\n') + '\n'
 			: '';
 	writeFileSync(
 		join(dir, name.toLowerCase().replace(/\s+/g, '-') + '.art'),

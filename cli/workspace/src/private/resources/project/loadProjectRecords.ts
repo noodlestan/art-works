@@ -1,9 +1,14 @@
+import { createRecordsDocument } from '@art-js/records';
 import { type FSRecordFile, createFSRecordsAdapter } from '@art-lib/fs-records';
+import { createArtCodec } from '@art-md/codec';
 
 import type { WorkspaceConfig } from '../../../config/index.js';
 import type { ProjectRecord } from '../types.js';
 
-import { readProjectRecord } from './readProjectRecord.js';
+function readValue(value: unknown): string {
+	const text = String(value).trim();
+	return text.startsWith('`') && text.endsWith('`') ? text.slice(1, -1).trim() : text;
+}
 
 export async function loadProjectRecords(
 	config: WorkspaceConfig,
@@ -14,14 +19,47 @@ export async function loadProjectRecords(
 		patterns: config.discover.records.paths,
 	});
 	const recordFiles: FSRecordFile[] = await adapter.discoverRecordFiles();
+	const documentRecords = createRecordsDocument<FSRecordFile>({
+		codec: createArtCodec({}),
+		createContentSource: (file: FSRecordFile) => adapter.createContentSource(file),
+	});
+
 	const records = await Promise.all(
 		recordFiles
 			.filter(file => !file.error)
 			.map(async file => {
-				const contentSource = adapter.createContentSource(file);
-				const content = await contentSource.readContent();
-				const fileWithContent = { ...file, content };
-				return readProjectRecord(fileWithContent);
+				try {
+					const collection = await documentRecords.read(file);
+					const extracted = await collection.extract();
+					const recordHandle = extracted.find(
+						r => typeof r.name === 'string' && r.name.startsWith('Project:'),
+					);
+					const name = recordHandle
+						? String(recordHandle.name)
+								.replace(/^Project:\s*/, '')
+								.trim()
+						: '';
+					if (!recordHandle || !name) {
+						console.warn(`project record ${file.filename}: missing name, skipped`);
+						return null;
+					}
+					const path = recordHandle.path ? readValue(recordHandle.path) : '.';
+					const namespaceNames = recordHandle.namespaces
+						? String(recordHandle.namespaces)
+								.split('\n')
+								.map(line => line.replace(/^-\s*Namespace:\s*/, '').trim())
+								.filter(Boolean)
+						: [];
+					const record: ProjectRecord = {
+						kind: 'project',
+						name,
+						path,
+						namespaceNames,
+					};
+					return record;
+				} catch {
+					return null;
+				}
 			}),
 	);
 	return records.filter((record): record is ProjectRecord => record !== null);
