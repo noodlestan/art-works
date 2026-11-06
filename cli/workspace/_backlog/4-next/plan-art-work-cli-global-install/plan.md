@@ -2,7 +2,7 @@
 
 **ID:** `art-work-cli-global-install`
 
-**Status:** `WORKING`
+**Status:** `DONE`
 
 **Template:** `.agents/domains/plans/templates/plan.tart`
 
@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `update-art-work-knowledge` is `WORKING` — delegated to a worker (final iteration); integrate its report on return to close the plan.
+All five iterations `DONE` — move this plan out of `4-next` and record the backlog transition.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status    |
-| ----------------------------------------- | --------- |
-| Iteration: Refactor Config Semantics      | `DONE`    |
-| Iteration: Migrate Record Kinds to Facade | `DONE`    |
-| Iteration: Discover configuration file    | `DONE`    |
-| Iteration: Add Init command               | `DONE`    |
-| Iteration: Update Art Work Knowledge      | `WORKING` |
+| Iteration / Instructions                  | Status |
+| ----------------------------------------- | ------ |
+| Iteration: Refactor Config Semantics      | `DONE` |
+| Iteration: Migrate Record Kinds to Facade | `DONE` |
+| Iteration: Discover configuration file    | `DONE` |
+| Iteration: Add Init command               | `DONE` |
+| Iteration: Update Art Work Knowledge      | `DONE` |
 
 ### Iteration: Refactor Config Semantics
 
@@ -401,9 +401,9 @@ build(art-workspace-cli): Add Init Command.
 
 **Id:** `update-art-work-knowledge`
 
-**Status:** `WORKING`
+**Status:** `DONE`
 
-**Delegation:** `WORKING` — worker `agent-worker` (`ses_e4f54fc8bffeM2ugYRmQhQzXwC`) since `2026-11-06T11:42:22Z`.
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e4f54fc8bffeM2ugYRmQhQzXwC`) since `2026-11-06T11:42:22Z`; report `./plan-art-work-cli-global-install/instructions/update-art-work-knowledge__report.md`.
 
 **Purpose:** Update Art Work knowledge files to reflect the global-install capability and new configuration semantics.
 
@@ -426,9 +426,9 @@ build(art-workspace-cli): Add Init Command.
 
 #### Commits:
 
-| ID                          | Repository / Checkout / Branch    | Policy       | Hash | Status     |
-| --------------------------- | --------------------------------- | ------------ | ---- | ---------- |
-| `update-art-work-knowledge` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
+| ID                          | Repository / Checkout / Branch    | Policy       | Hash      | Status      |
+| --------------------------- | --------------------------------- | ------------ | --------- | ----------- |
+| `update-art-work-knowledge` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `7eb9033` | `COMMITTED` |
 
 ##### Commit: `update-art-work-knowledge`
 
@@ -452,6 +452,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 - Implementation checkpoint `102e828` is pushed. `npm run ci` passes: lint, build, 358 unit tests, and 26 integration tests.
 - Iteration `discover-config-location` landed at `1123faa`, `ac0337a`, `e0fbe90` (pushed): cwd→parent manifest discovery feeds the shipped `node_modules/.art-workspace` bundle cache with no second compile location, the run banner prints `Running from config at {path}` / `running without config`, verified from local dev and an isolated global install; suite 88 unit files / 348 tests + 28 integration green.
 - Iteration `add-init-command` landed at `6f1d568` (pushed): `init` writes `.art-workspace.mts` with the new config shape (no `clone`/`records`), refuses to overwrite an existing manifest, and the generated config is discovered and loaded by a follow-up `sanity` — verified from local dev and an isolated global install; suite 91 files / 381 tests green.
+- Iteration `update-art-work-knowledge` landed at `7eb9033` (pushed): `knowledge/index.md` documents the global-install execution model and config shape, `$ART_WORKS/_guide.md` gained a Global Install Usage section, and `src/config/README.md` covers manifest format, discovery, and the shipped bundle cache — no `clone` or standalone `records` left in the updated files; suite 91 files / 381 tests green.
 - `@art-lib/fs-records@0.0.3` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
 - Iteration `migrate-record-kinds-to-facade` landed at `cc3b7fc` (pushed): the four record-kind loaders extract through the `@art-js/records` facade, the legacy `read*Record` parsers are deleted, facade-only greps are clean, and the package suite runs 89 files / 371 tests green with no `it.todo()`.
 
@@ -467,7 +468,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 ### Decisions
 
 - `refactor-config-semantics` is `DONE` at checkpoint `102e828` — Steps 1–6, discovery/content wiring, and the checkout facade shipped; the remaining four-kind extraction is carved into Iteration: Migrate Record Kinds to Facade, whose instruction is authored against `createRecordsDocument`.
-- Iterations Migrate Record Kinds to Facade, Discover configuration file, Add Init command, and Update Art Work Knowledge are `READY` and must be delegated in order; placeholder commits execute on branch `main`.
+- Iterations Migrate Record Kinds to Facade, Discover configuration file, Add Init command, and Update Art Work Knowledge were delegated in order and are all `DONE`; their commits executed on branch `main`.
 - The `output` config key is removed per the target `WorkspaceConfig` shape; consumers are updated in Iteration: Refactor Config Semantics.
 
 ### Knowledge to Update
@@ -485,3 +486,4 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 - **Missing `**Instructions Mode:**`** on iterations `refactor-config-semantics`, `discover-config-location`, `add-init-command`, and `update-art-work-knowledge` — **resolved**: all five iterations now declare `INSTRUCTIONS_SELF_CONTAINED_FILE`. Delegating-record completeness only.
 - **Template sections not rendered** — no `### (Scope) Package: Art Workspace Cli`, `## Execution Context`, `## Resource Kinds in Scope`, or `## Workflows`; the header lacks `**Has Context File:**`; Upstream Work, Required Skills, and Domains are tables where the work-item templates render bullet lists. Plan rendering only; workers enter through self-contained instruction files.
 - **Stale operation paths in Operating Instructions** — the Purpose lines pointed at `$DOMAINS/work/workflows/{planning-work,executing-work}/ops/*.art`, which do not exist; the real definitions live at `writing-commit-message/operation.art`, `setting-up/operation.art`, and `verifying-completion/operation.art`. **Resolved**: the plan's Purpose lines and every instruction file now use the `operation.art` layout.
+- **Package `README.md` config sample is stale** _(worker feedback, `update-art-work-knowledge`)_ — it still shows the old shape (`clone`, `checkouts`, `records`); outside that iteration's scope and already tracked as documentation drift in the backlog.
