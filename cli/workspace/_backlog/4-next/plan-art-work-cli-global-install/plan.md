@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `discover-config-location` is `WORKING` — delegated to a worker; integrate its report on return, then `add-init-command` and `update-art-work-knowledge`, in order.
+- `discover-config-location` is `DONE` at `1123faa` + `ac0337a` + `e0fbe90` (report landed next to its instruction file). Delegate `add-init-command` next; then `update-art-work-knowledge`.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status    |
-| ----------------------------------------- | --------- |
-| Iteration: Refactor Config Semantics      | `DONE`    |
-| Iteration: Migrate Record Kinds to Facade | `DONE`    |
-| Iteration: Discover configuration file    | `WORKING` |
-| Iteration: Add Init command               | `READY`   |
-| Iteration: Update Art Work Knowledge      | `READY`   |
+| Iteration / Instructions                  | Status  |
+| ----------------------------------------- | ------- |
+| Iteration: Refactor Config Semantics      | `DONE`  |
+| Iteration: Migrate Record Kinds to Facade | `DONE`  |
+| Iteration: Discover configuration file    | `DONE`  |
+| Iteration: Add Init command               | `READY` |
+| Iteration: Update Art Work Knowledge      | `READY` |
 
 ### Iteration: Refactor Config Semantics
 
@@ -303,9 +303,9 @@ refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
 
 **Id:** `discover-config-location`
 
-**Status:** `WORKING`
+**Status:** `DONE`
 
-**Delegation:** `WORKING` — worker `agent-worker` (`ses_e51182387ffei3iwMel3s7bpy1`) since `2026-11-06T03:29:37Z`.
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e51182387ffei3iwMel3s7bpy1`) since `2026-11-06T03:29:37Z`; report `./plan-art-work-cli-global-install/instructions/discover-config-location__report.md`.
 
 **Purpose:** Make the Art Workspace Cli execute independently of its source checkout when installed globally.
 
@@ -328,11 +328,11 @@ refactor(art-workspace-cli): Migrate record kind loaders to the records facade.
 
 #### Commits:
 
-| ID                           | Repository / Checkout / Branch    | Policy       | Hash | Status     |
-| ---------------------------- | --------------------------------- | ------------ | ---- | ---------- |
-| `discover-config-location`   | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
-| `compile-config-to-temp-dir` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
-| `show-config-options`        | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` |      | `AUTHORED` |
+| ID                           | Repository / Checkout / Branch    | Policy       | Hash      | Status      |
+| ---------------------------- | --------------------------------- | ------------ | --------- | ----------- |
+| `discover-config-location`   | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `1123faa` | `COMMITTED` |
+| `compile-config-to-temp-dir` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `ac0337a` | `COMMITTED` |
+| `show-config-options`        | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `e0fbe90` | `COMMITTED` |
 
 ##### Commit: `discover-config-location`
 
@@ -446,6 +446,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 ### Evidence
 
 - Implementation checkpoint `102e828` is pushed. `npm run ci` passes: lint, build, 358 unit tests, and 26 integration tests.
+- Iteration `discover-config-location` landed at `1123faa`, `ac0337a`, `e0fbe90` (pushed): cwd→parent manifest discovery feeds the shipped `node_modules/.art-workspace` bundle cache with no second compile location, the run banner prints `Running from config at {path}` / `running without config`, verified from local dev and an isolated global install; suite 88 unit files / 348 tests + 28 integration green.
 - `@art-lib/fs-records@0.0.3` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
 - Iteration `migrate-record-kinds-to-facade` landed at `cc3b7fc` (pushed): the four record-kind loaders extract through the `@art-js/records` facade, the legacy `read*Record` parsers are deleted, facade-only greps are clean, and the package suite runs 89 files / 371 tests green with no `it.todo()`.
 
