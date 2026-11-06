@@ -7,13 +7,13 @@ WIP tracker, structured like the session parking lot: **ACTIONABLE** (in progres
 - **Complete the `art-work` → `art-works` rename** — identity records, package identity (`@art-works/workspace-cli`, bin `art-workspace-cli`, path `cli/workspace`), checkout, and workspace records are renamed; residual naming decisions and follow-ups stay tracked in `milestone-rename-art-work-to-art-works`.
 - **Participate in the Art Boards Inception Whiteboard (owned by `ART_BOARDS`)** — board at `$ART_BOARDS/cli/whiteboard/_roadmap/whiteboard-art-boards-inception/whiteboard.md`.
 - **Participate in the Art Records Whiteboard (owned by `ART_JS`)** — board at `$ART_JS/_backlog/whiteboard-art-records/whiteboard.md`; this project is the highest priority.
-- **Ship `plan-art-work-cli-global-install`** — make the CLI work from a global install; the plan is `READY` with checkpoint `102e828` delivered, and the remaining ACTIONABLE is the delegate-ready iteration `migrate-record-kinds-to-facade` (four record kinds → the facade).
+- **Ship `plan-art-work-cli-global-install`** — make the CLI work from a global install; the plan is `WORKING` with 2 of 5 iterations `DONE` (config semantics at `102e828`, facade migration at `cc3b7fc`), discovery iteration prepped for delegation next.
 
 ---
 
 ## ACTIONABLE
 
-- **Migrate the remaining record kinds to `@art-js/records`** — `repository`, `project`, `namespace`, `package` loaders still use the legacy `read*Record` regex parsers; now Iteration `migrate-record-kinds-to-facade` (`READY`) in `plan-art-work-cli-global-install` with instructions authored — ready to delegate.
+- None current.
 
 ## PENDING
 
