@@ -45,7 +45,7 @@ Make the Art Workspace Cli read and write `.art` files through the Art JS librar
 | Milestone   | `$ART_JS/_roadmap/3-now/milestone-art-records/milestone.md`               | Art JS side of records: the record facade this CLI will consume.                 |
 | Plan        | `$ART_LIB/_backlog/4-next/plan-add-fs-records-adapter/plan.md` (`READY`)  | Supplies `@art-lib/fs-records`: discovery, content read, content write.          |
 | Milestone   | `$ART_WORKS_CLI/_roadmap/3-now/milestone-art-work-cli-one/milestone.md`   | Current CLI milestone; its Phase 3 decompose work feeds into this one.           |
-| Plan        | `$ART_WORKS_CLI/_backlog/4-next/plan-art-work-cli-global-install/plan.md` | Holds the gated `refactor-config-semantics` iteration that consumes the adapter. |
+| Plan        | `$ART_WORKS_CLI/_backlog/1-done/plan-art-work-cli-global-install/plan.md` | Holds the gated `refactor-config-semantics` iteration that consumes the adapter. |
 
 ### Required Skills
 
@@ -129,7 +129,7 @@ No downstream work items are captured yet.
 ### Next
 
 - Refine the Phase 1 and Phase 2 descriptions against the `AGREED` chain contracts, then draft a plan for Phase 2 (read path) — Phase 1's evaluation question is already answered.
-- Keep the gated `refactor-config-semantics` iteration in `$ART_WORKS_CLI/_backlog/4-next/plan-art-work-cli-global-install/plan.md` aligned with this milestone: the same adapter boundary, retitled to canonical names.
+- Keep the gated `refactor-config-semantics` iteration in `$ART_WORKS_CLI/_backlog/1-done/plan-art-work-cli-global-install/plan.md` aligned with this milestone: the same adapter boundary, retitled to canonical names.
 
 ### Blockers
 

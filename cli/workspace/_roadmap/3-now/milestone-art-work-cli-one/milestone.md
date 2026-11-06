@@ -142,7 +142,7 @@ Complete the workspace CLI across 3 phases: establish the CLI baseline, implemen
 | 3     | Plan: Extract Workspace Cli to Art Work `_backlog/0-archive/2026-09-06-plan-extract-workspace-cli-art-work/plan.md`          | `ARCHIVED` |
 | 3     | Plan: Extract Read/Write Records to Art Cli `_backlog/0-archive/2026-09-06-plan-extract-read-write-records-art-lib/plan.md`  | `ARCHIVED` |
 | 3     | Plan: Improvements and Fixes `_backlog/0-archive/2026-09-12-plan-improvements-and-fixes/plan.md`                             | `ARCHIVED` |
-| 3     | Plan: Make Art Workspace Cli work from global install `_backlog/4-next/plan-art-work-cli-global-install/plan.md`             | `PLANNING` |
+| 3     | Plan: Make Art Workspace Cli work from global install `_backlog/1-done/plan-art-work-cli-global-install/plan.md`             | `DONE`     |
 | 3     | Plan: Optimize Tests and Update Knowledge `_backlog/4-next/plan-optimize-tests-update-knowledge/plan.md`                     | `DRAFT`    |
 | 3     | Plan: Add Config Cache `_backlog/0-archive/2026-10-13-plan-add-config-cache/plan.md`                                         | `ARCHIVED` |
 | -     |                                                                                                                              |            |
@@ -160,7 +160,7 @@ Complete the workspace CLI across 3 phases: establish the CLI baseline, implemen
 
 ### Next
 
-- Prepare `art-work-cli-global-install` for delegation.
+- `art-work-cli-global-install` delivered — 5/5 iterations `DONE`; next: `plan-optimize-tests-update-knowledge`.
 
 ### Blockers
 
