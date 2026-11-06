@@ -18,7 +18,7 @@ WIP tracker, structured like the session parking lot: **ACTIONABLE** (in progres
 ## PENDING
 
 - **Adopt the expanded fields API from `@art-js/records`** — waiting on `plan-expand-fields-api` at `$ART_JS/_backlog/4-next/plan-expand-fields-api/plan.md` (art-js, `PLANNING` in `4-next`) to land and publish: bump the dependency, update our field reads to call the new text-read method (the default accessor will return markdown, backticks included), keep the rule — tolerate backticked values on read, always write non-backticked — and retire the local `checkoutFields` workaround. Sequenced with the post-bulk dependency refresh below — never mid-migration.
-- **Post-bulk dependency refresh** — declare `@art-md/primitives` in `cli/workspace/package.json` (direct type imports, today transitive at `0.0.6`) and decide the `@art-md/codec` bump from pinned `0.0.3` to latest `0.0.5`. Scheduled strictly **after the bulk of the work** — all five `plan-art-work-cli-global-install` iterations delivered, including `migrate-record-kinds-to-facade` — so every migration commit stays dependency-clean.
+- **Post-bulk dependency refresh** — declare `@art-md/primitives` in `cli/workspace/package.json` (direct type imports, today transitive at `0.0.6`) and decide the `@art-md/codec` bump from pinned `0.0.3` to latest `0.0.5`. Scheduled strictly **after the bulk of the work** — all five `plan-art-work-cli-global-install` iterations delivered, including `migrate-record-kinds-to-facade` — so every migration commit stays dependency-clean. Tracked by `plan-post-bulk-dependency-refresh` at `_backlog/6-plan/plan-post-bulk-dependency-refresh/plan.md` (`READY`, instructions inlined).
 
 ## BLOCKERS
 
