@@ -39,6 +39,9 @@ describe('createConfig', () => {
 
 		expect(config.root.path).toBe(root);
 		expect(config.checkouts.path).toBe('manifest-checkouts');
+		expect(vi.mocked(console.info)).toHaveBeenCalledWith(
+			`Running from config at ${join(root, MANIFEST_FILE)}`,
+		);
 	});
 
 	it('WHEN the manifest is in a parent dir it walks up and loads the config from the parent', async () => {
@@ -52,6 +55,9 @@ describe('createConfig', () => {
 		expect(config.root.path).toBe(parent);
 		expect(config.checkouts.path).toBe('manifest-checkouts');
 		expect(config.data.store.basePath).toBe(resolve(parent, '_records/'));
+		expect(vi.mocked(console.info)).toHaveBeenCalledWith(
+			`Running from config at ${join(parent, MANIFEST_FILE)}`,
+		);
 	});
 
 	it('WHEN no manifest exists in the cwd or any parent it falls back to the defaults', async () => {
@@ -62,6 +68,7 @@ describe('createConfig', () => {
 		expect(config.root.path).toBe(root);
 		expect(config.checkouts.path).toBe('checkouts');
 		expect(config.data.template).toBe('.agents/domains/workspace/templates/checkout.art.njk');
+		expect(vi.mocked(console.info)).toHaveBeenCalledWith('running without config');
 		expect(vi.mocked(console.warn)).toHaveBeenCalledWith(
 			expect.stringContaining(`${MANIFEST_FILE} not found at ${root}`),
 		);

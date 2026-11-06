@@ -35,7 +35,14 @@ export async function createConfig(
 	options?: { cache?: boolean; verbose?: boolean },
 ): Promise<WorkspaceConfig> {
 	logger.log(createGenericOperation('locate-config'));
-	const configRoot = discoverConfigRoot(root) ?? root;
+	const configRoot = discoverConfigRoot(root);
+
+	if (configRoot === null) {
+		console.info('running without config');
+	} else {
+		console.info(`Running from config at ${join(configRoot, MANIFEST_FILE)}`);
+	}
+
 	logger.log(createGenericOperation('load-config'));
-	return await loadWorkspaceConfig(configRoot, options);
+	return await loadWorkspaceConfig(configRoot ?? root, options);
 }

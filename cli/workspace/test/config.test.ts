@@ -115,6 +115,9 @@ describe('cli config cache', () => {
 
 		expect(result.code).toBe(0);
 		expect(output(result)).not.toContain('not found at');
+		expect(output(result)).toContain(
+			`Running from config at ${join(realpathSync(root), MANIFEST_FILE)}`,
+		);
 		expect(existsSync(join(resolveCacheDir(root), 'config.bundle.mjs'))).toBe(true);
 		expect(existsSync(join(nested, ...CACHE_DIR_SEGMENTS))).toBe(false);
 		expect(existsSync(join(nested, '.art-workspace-bundle.mjs'))).toBe(false);

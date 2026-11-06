@@ -1,15 +1,18 @@
-import { writeFileSync } from 'node:fs';
+import { realpathSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { makeTempDir } from '../src/test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../src/test/helpers/tempDirs/removeTempDirs.js';
 
 import { ENCODING, PACKAGE_ROOT } from './helpers/constants.js';
 import { setupWorkspace } from './helpers/setupWorkspace.js';
 import { spawnCli } from './helpers/spawnCli.js';
 import { type TestCliResult } from './helpers/types.js';
+
+const MANIFEST_FILE = '.art-workspace.mts';
 
 const tempDirs: string[] = [];
 
@@ -67,6 +70,19 @@ describe('cli integration', () => {
 
 			expect(result.code).toBe(0);
 			expect(output(result)).not.toContain('not found at');
+			// `process.cwd()` reports the symlink-resolved temp path on macOS
+			expect(output(result)).toContain(
+				`Running from config at ${join(realpathSync(root), MANIFEST_FILE)}`,
+			);
+		});
+
+		it('WHEN no manifest exists in the cwd or any parent, advertises running without config', async () => {
+			const root = makeTempDir(tempDirs);
+
+			const result = await spawnCli({ args: ['sanity'], cwd: root });
+
+			expect(result.code).toBe(0);
+			expect(output(result)).toContain('running without config');
 		});
 
 		it('WHEN the manifest is malformed, reports the manifest path', async () => {
