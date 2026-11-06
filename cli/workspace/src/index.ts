@@ -5,6 +5,7 @@ import { Command } from 'commander';
 import { runBranch } from './commands/branch/runBranch.js';
 import { runCheckoutsRun } from './commands/checkouts/runCheckoutsRun.js';
 import { runClone } from './commands/clone/runClone.js';
+import { runInit } from './commands/init/runInit.js';
 import { runLink } from './commands/link/runLink.js';
 import { runPublish } from './commands/publish/runPublish.js';
 import { runPull } from './commands/pull/runPull.js';
@@ -44,6 +45,23 @@ program
 	.version(__BUILD_VERSION__);
 
 program.option('--no-config-cache', 'Ignore the config cache and recompile the config');
+
+type InitOptions = { output?: string };
+
+program
+	.command('init')
+	.description('Create a configuration file with default values')
+	.option('-o, --output <mode>', 'One of quiet|verbose')
+	.action(async (options: InitOptions, command: Command) => {
+		const root = process.cwd();
+		const ctx = await createCommandContext(root, command, options.output);
+
+		const created = await runInit(ctx, { root });
+
+		if (!created) {
+			process.exitCode = 1;
+		}
+	});
 
 type SanityOptions = { auto?: boolean; refetch?: boolean; output?: string };
 

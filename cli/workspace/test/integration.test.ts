@@ -1,4 +1,4 @@
-import { realpathSync, writeFileSync } from 'node:fs';
+import { readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -42,7 +42,16 @@ describe('cli integration', () => {
 
 			expect(result.code).toBe(0);
 			expect(result.stdout).toContain('Commands:');
-			for (const command of ['sanity', 'clone', 'branch', 'pull', 'sync', 'checkouts', 'repo']) {
+			for (const command of [
+				'sanity',
+				'init',
+				'clone',
+				'branch',
+				'pull',
+				'sync',
+				'checkouts',
+				'repo',
+			]) {
 				expect(result.stdout).toContain(command);
 			}
 		});
@@ -98,6 +107,50 @@ describe('cli integration', () => {
 	});
 
 	describe('commands', () => {
+		describe('init', () => {
+			it('WHEN invoked in an empty directory, creates the manifest with the default values', async () => {
+				const root = makeTempDir(tempDirs);
+
+				const result = await spawnCli({ args: ['init'], cwd: root });
+
+				const content = readFileSync(join(root, MANIFEST_FILE), ENCODING);
+
+				expect(result.code).toBe(0);
+				expect(output(result)).toContain(`Created ${MANIFEST_FILE} at`);
+				expect(content).toContain('root: { path: process.cwd() }');
+				expect(content).toContain("checkouts: { path: 'checkouts' }");
+				expect(content).toContain('store:');
+				expect(content).toContain('discover:');
+				expect(content).toContain('records:');
+				expect(content).not.toContain('clone');
+			});
+
+			it('WHEN the manifest already exists, refuses to overwrite it and exits non-zero', async () => {
+				const root = makeTempDir(tempDirs);
+				writeFileSync(join(root, MANIFEST_FILE), 'export default {};');
+
+				const result = await spawnCli({ args: ['init'], cwd: root });
+
+				expect(result.code).toBe(1);
+				expect(output(result)).toContain(`${MANIFEST_FILE} already exists at`);
+				expect(readFileSync(join(root, MANIFEST_FILE), ENCODING)).toBe('export default {};');
+			});
+
+			it('WHEN the manifest was created, subsequent runs discover and load it', async () => {
+				const root = makeTempDir(tempDirs);
+				await spawnCli({ args: ['init'], cwd: root });
+
+				const result = await spawnCli({ args: ['sanity'], cwd: root });
+
+				expect(result.code).toBe(0);
+				expect(output(result)).not.toContain('not found at');
+				// `process.cwd()` reports the symlink-resolved temp path on macOS
+				expect(output(result)).toContain(
+					`Running from config at ${join(realpathSync(root), MANIFEST_FILE)}`,
+				);
+			});
+		});
+
 		describe('sanity', () => {
 			it('WHEN invoked by name only, runs and prints a checkout report', async () => {
 				const root = await setupWorkspace(tempDirs);
