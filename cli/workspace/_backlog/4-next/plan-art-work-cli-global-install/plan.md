@@ -2,7 +2,7 @@
 
 **ID:** `art-work-cli-global-install`
 
-**Status:** `READY`
+**Status:** `WORKING`
 
 **Template:** `.agents/domains/plans/templates/plan.tart`
 
@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `refactor-config-semantics` is `DONE` at checkpoint `102e828` and its instruction file is re-baselined. Delegate `migrate-record-kinds-to-facade` (`READY`, instructions authored) next; the dependent iterations — `discover-config-location`, `add-init-command`, `update-art-work-knowledge` — follow in order.
+- `migrate-record-kinds-to-facade` is `DONE` at `cc3b7fc` (report landed next to its instruction file). Delegate `discover-config-location` next; then `add-init-command` and `update-art-work-knowledge`, in order.
 
 ### Blockers
 
@@ -123,7 +123,7 @@ Additionally verify the CLI from a global installation and from the local develo
 | Iteration / Instructions                  | Status  |
 | ----------------------------------------- | ------- |
 | Iteration: Refactor Config Semantics      | `DONE`  |
-| Iteration: Migrate Record Kinds to Facade | `READY` |
+| Iteration: Migrate Record Kinds to Facade | `DONE`  |
 | Iteration: Discover configuration file    | `READY` |
 | Iteration: Add Init command               | `READY` |
 | Iteration: Update Art Work Knowledge      | `READY` |
@@ -258,7 +258,9 @@ refactor(art-workspace-cli): Refactor config options for better semantics.
 
 **Id:** `migrate-record-kinds-to-facade`
 
-**Status:** `READY`
+**Status:** `DONE`
+
+**Delegation:** `DONE` — worker `agent-worker` (`ses_e5176230bffe6VOk3on24CQtsN`) since `2026-11-06T01:46:55Z`; report `./plan-art-work-cli-global-install/instructions/migrate-record-kinds-to-facade__report.md`.
 
 **Purpose:** Finish Step 7 extraction so every record kind reads through the `@art-js/records` facade and no legacy parser remains.
 
@@ -281,9 +283,9 @@ refactor(art-workspace-cli): Refactor config options for better semantics.
 
 #### Commits:
 
-| ID                               | Repository / Checkout / Branch    | Policy       | Hash  | Status     |
-| -------------------------------- | --------------------------------- | ------------ | ----- | ---------- |
-| `migrate-record-kinds-to-facade` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | (TBD) | `AUTHORED` |
+| ID                               | Repository / Checkout / Branch    | Policy       | Hash      | Status      |
+| -------------------------------- | --------------------------------- | ------------ | --------- | ----------- |
+| `migrate-record-kinds-to-facade` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | `cc3b7fc` | `COMMITTED` |
 
 ##### Commit: `migrate-record-kinds-to-facade`
 
@@ -435,6 +437,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 - Implementation checkpoint `102e828` is pushed. `npm run ci` passes: lint, build, 358 unit tests, and 26 integration tests.
 - `@art-lib/fs-records@0.0.3` is declared in `cli/workspace/package.json`; adapter discovery and per-file content reads are wired in all five record loaders.
+- Iteration `migrate-record-kinds-to-facade` landed at `cc3b7fc` (pushed): the four record-kind loaders extract through the `@art-js/records` facade, the legacy `read*Record` parsers are deleted, facade-only greps are clean, and the package suite runs 89 files / 371 tests green with no `it.todo()`.
 
 ### Findings
 
@@ -463,4 +466,6 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Feedback
 
-- None.
+- **Missing `**Instructions Mode:**`** on iterations `refactor-config-semantics`, `discover-config-location`, `add-init-command`, and `update-art-work-knowledge` (all carry instruction file paths; only `migrate-record-kinds-to-facade` declares the mode). Delegating-record completeness only.
+- **Template sections not rendered** — no `### (Scope) Package: Art Workspace Cli`, `## Execution Context`, `## Resource Kinds in Scope`, or `## Workflows`; the header lacks `**Has Context File:**`; Upstream Work, Required Skills, and Domains are tables where the work-item templates render bullet lists. Plan rendering only; workers enter through self-contained instruction files.
+- **Stale operation paths in Operating Instructions** — the Purpose lines point at `$DOMAINS/work/workflows/{planning-work,executing-work}/ops/*.art`, which do not exist; the real definitions live at `writing-commit-message/operation.art`, `setting-up/operation.art`, and `verifying-completion/operation.art` (the instruction file already links them correctly).
