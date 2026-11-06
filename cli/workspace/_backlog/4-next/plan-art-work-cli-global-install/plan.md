@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `refactor-config-semantics` is `DELIVERED` at checkpoint `102e828` and its instruction file is re-baselined. Delegate `migrate-record-kinds-to-facade` (`READY`, instructions authored) next; the dependent iterations — `discover-config-location`, `add-init-command`, `update-art-work-knowledge` — follow in order.
+- `refactor-config-semantics` is `DONE` at checkpoint `102e828` and its instruction file is re-baselined. Delegate `migrate-record-kinds-to-facade` (`READY`, instructions authored) next; the dependent iterations — `discover-config-location`, `add-init-command`, `update-art-work-knowledge` — follow in order.
 
 ### Blockers
 
@@ -120,19 +120,19 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status      |
-| ----------------------------------------- | ----------- |
-| Iteration: Refactor Config Semantics      | `DELIVERED` |
-| Iteration: Migrate Record Kinds to Facade | `READY`     |
-| Iteration: Discover configuration file    | `READY`     |
-| Iteration: Add Init command               | `READY`     |
-| Iteration: Update Art Work Knowledge      | `READY`     |
+| Iteration / Instructions                  | Status  |
+| ----------------------------------------- | ------- |
+| Iteration: Refactor Config Semantics      | `DONE`  |
+| Iteration: Migrate Record Kinds to Facade | `READY` |
+| Iteration: Discover configuration file    | `READY` |
+| Iteration: Add Init command               | `READY` |
+| Iteration: Update Art Work Knowledge      | `READY` |
 
 ### Iteration: Refactor Config Semantics
 
 **Id:** `refactor-config-semantics`
 
-**Status:** `DELIVERED`
+**Status:** `DONE`
 
 **Purpose:** Make the intent behind each config option more explicit.
 
@@ -281,9 +281,9 @@ refactor(art-workspace-cli): Refactor config options for better semantics.
 
 #### Commits:
 
-| ID                               | Repository / Checkout / Branch    | Policy       | Hash  | Status        |
-| -------------------------------- | --------------------------------- | ------------ | ----- | ------------- |
-| `migrate-record-kinds-to-facade` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | (TBD) | `PLACEHOLDER` |
+| ID                               | Repository / Checkout / Branch    | Policy       | Hash  | Status     |
+| -------------------------------- | --------------------------------- | ------------ | ----- | ---------- |
+| `migrate-record-kinds-to-facade` | Art Works / `$ART_WORKS` / `main` | `AUTONOMOUS` | (TBD) | `AUTHORED` |
 
 ##### Commit: `migrate-record-kinds-to-facade`
 
@@ -447,7 +447,7 @@ docs(art-workspace-cli): Update knowledge for global install and config semantic
 
 ### Decisions
 
-- `refactor-config-semantics` is `DELIVERED` at checkpoint `102e828` — Steps 1–6, discovery/content wiring, and the checkout facade shipped; the remaining four-kind extraction is carved into Iteration: Migrate Record Kinds to Facade, whose instruction is authored against `createRecordsDocument`.
+- `refactor-config-semantics` is `DONE` at checkpoint `102e828` — Steps 1–6, discovery/content wiring, and the checkout facade shipped; the remaining four-kind extraction is carved into Iteration: Migrate Record Kinds to Facade, whose instruction is authored against `createRecordsDocument`.
 - Iterations Migrate Record Kinds to Facade, Discover configuration file, Add Init command, and Update Art Work Knowledge are `READY` and must be delegated in order; placeholder commits execute on branch `main`.
 - The `output` config key is removed per the target `WorkspaceConfig` shape; consumers are updated in Iteration: Refactor Config Semantics.
 
