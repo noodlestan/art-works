@@ -64,7 +64,7 @@ Five iterations in Package: Art Workspace Cli (`$PACKAGE`): land the config-sema
 
 ### Next
 
-- `add-init-command` is `DONE` at `6f1d568` (report landed next to its instruction file). Delegate `update-art-work-knowledge` — the final iteration.
+- `update-art-work-knowledge` is `WORKING` — delegated to a worker (final iteration); integrate its report on return to close the plan.
 
 ### Blockers
 
@@ -120,13 +120,13 @@ Additionally verify the CLI from a global installation and from the local develo
 
 ## Items:
 
-| Iteration / Instructions                  | Status  |
-| ----------------------------------------- | ------- |
-| Iteration: Refactor Config Semantics      | `DONE`  |
-| Iteration: Migrate Record Kinds to Facade | `DONE`  |
-| Iteration: Discover configuration file    | `DONE`  |
-| Iteration: Add Init command               | `DONE`  |
-| Iteration: Update Art Work Knowledge      | `READY` |
+| Iteration / Instructions                  | Status    |
+| ----------------------------------------- | --------- |
+| Iteration: Refactor Config Semantics      | `DONE`    |
+| Iteration: Migrate Record Kinds to Facade | `DONE`    |
+| Iteration: Discover configuration file    | `DONE`    |
+| Iteration: Add Init command               | `DONE`    |
+| Iteration: Update Art Work Knowledge      | `WORKING` |
 
 ### Iteration: Refactor Config Semantics
 
@@ -401,7 +401,9 @@ build(art-workspace-cli): Add Init Command.
 
 **Id:** `update-art-work-knowledge`
 
-**Status:** `READY`
+**Status:** `WORKING`
+
+**Delegation:** `WORKING` — worker `agent-worker` (`ses_e4f54fc8bffeM2ugYRmQhQzXwC`) since `2026-11-06T11:42:22Z`.
 
 **Purpose:** Update Art Work knowledge files to reflect the global-install capability and new configuration semantics.
 
