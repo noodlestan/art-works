@@ -1,3 +1,5 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { LinkedPending } from '../../operations/types.js';
 import type { Checkout } from '../../store/createCheckout.js';
 
@@ -6,18 +8,13 @@ export function createLinkedOperation(
 	pkg: string,
 	target: string,
 ): LinkedPending {
-	return {
-		ts: new Date(),
+	const data = {
 		checkout,
-		outcome: 'pending',
-		operation: 'linked',
 		package: pkg,
 		target,
-		message() {
-			return `linking ${pkg}`;
-		},
-		timing() {
-			return this.finishedTs ? this.finishedTs.getTime() - this.ts.getTime() : NaN;
-		},
 	};
+	const toText = () => {
+		return `linking ${pkg}`;
+	};
+	return createGenericOperation('linked', data, toText);
 }

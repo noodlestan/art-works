@@ -5,12 +5,12 @@ import { makeCheckoutMock } from '../../../test/helpers/checkout/makeCheckoutMoc
 import { createBranchOperation } from './createBranchOperation.js';
 
 describe('createBranchOperation', () => {
-	it('WHEN a branch operation is created it has correct operation, outcome and message', () => {
+	it('WHEN a branch operation is created it has correct operation, outcome and text', () => {
 		const checkout = makeCheckoutMock();
 		const pending = createBranchOperation(checkout, 'feat/x');
 		expect(pending.operation).toBe('branch');
 		expect(pending.outcome).toBe('pending');
-		expect(pending.branch).toBe('feat/x');
-		expect(pending.message()).toContain('feat/x');
+		expect(pending.data?.branch).toBe('feat/x');
+		expect(pending.text()).toContain('feat/x');
 	});
 });

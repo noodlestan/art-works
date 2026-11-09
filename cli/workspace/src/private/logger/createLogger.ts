@@ -1,12 +1,13 @@
 import { createLogger as createBufferingLogger } from '@art-lib/logger';
 import type { LogFormatter, LogWriter, Message, MessageLevel, OutputMode } from '@art-lib/logger';
+import type { OperationOutcome } from '@art-lib/operations';
 
-import type { Operation, OperationOutcome } from '../operations/types.js';
+import type { Operation } from '../operations/types.js';
 import { makeOperationLogLine } from '../present/makeOperationLogLine.js';
 
 export interface LoggerAPI {
-	log: (op: Operation) => void;
-	setOutputMode: (mode: string | undefined) => void;
+	log(op: Operation): void;
+	setOutputMode(mode: string | undefined): void;
 }
 
 /** A `Message` carrying the operation its log line is rendered from. */
@@ -43,8 +44,8 @@ const stdoutLogWriter: LogWriter = {
 function toMessage(op: Operation): OperationMessage {
 	return {
 		level: levelOf(op.outcome),
-		text: () => op.message(),
-		ts: op.ts.getTime(),
+		text: () => op.text(),
+		ts: op.ts,
 		op,
 	};
 }

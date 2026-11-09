@@ -1,11 +1,11 @@
+import { createGenericOperation, createOperationFailure } from '@art-lib/operations';
+
 import { runWithConcurrency } from '../../private/async/runWithConcurrency.js';
 import { doPullCheckout } from '../../private/commands/checkouts/doPullCheckout.js';
 import { doPushCheckout } from '../../private/commands/checkouts/doPushCheckout.js';
 import { scanWorkspaceCheckout } from '../../private/commands/workspaces/scanWorkspaceCheckout.js';
 import { syncWorkspaceCheckout } from '../../private/commands/workspaces/syncWorkspaceCheckout.js';
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
-import { createOperationFailure } from '../../private/operations/createOperationFailure.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';
 import { presentWorkspaceReport } from '../../private/present/presentWorkspaceReport.js';

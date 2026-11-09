@@ -5,12 +5,12 @@ import { makeCheckoutMock } from '../../../test/helpers/checkout/makeCheckoutMoc
 import { createPullOperation } from './createPullOperation.js';
 
 describe('createPullOperation', () => {
-	it('WHEN a pull operation is created it has correct operation, outcome and message', () => {
+	it('WHEN a pull operation is created it has correct operation, outcome and text', () => {
 		const checkout = makeCheckoutMock();
 		const pending = createPullOperation(checkout, 'main');
 		expect(pending.operation).toBe('pull');
 		expect(pending.outcome).toBe('pending');
-		expect(pending.branch).toBe('main');
-		expect(pending.message()).toContain('main');
+		expect(pending.data?.branch).toBe('main');
+		expect(pending.text()).toContain('main');
 	});
 });

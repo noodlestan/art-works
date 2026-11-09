@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import { createGenericOperation } from '@art-lib/operations';
 import { Command } from 'commander';
 
 import { runBranch } from './commands/branch/runBranch.js';
@@ -18,7 +18,6 @@ import { createConfig } from './private/cli/createConfig.js';
 import { createContext } from './private/cli/createContext.js';
 import type { WorkspaceContext } from './private/context/types.js';
 import { createLogger } from './private/logger/createLogger.js';
-import { createGenericOperation } from './private/operations/createGenericOperation.js';
 
 const program = new Command();
 

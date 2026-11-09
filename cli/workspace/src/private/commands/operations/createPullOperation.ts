@@ -1,18 +1,15 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { PullPending } from '../../operations/types.js';
 import type { Checkout } from '../../store/createCheckout.js';
 
 export function createPullOperation(checkout: Checkout, branch: string): PullPending {
-	return {
-		ts: new Date(),
+	const data = {
 		checkout,
-		outcome: 'pending',
-		operation: 'pull',
 		branch,
-		message() {
-			return `from origin/${branch}`;
-		},
-		timing() {
-			return this.finishedTs ? this.finishedTs.getTime() - this.ts.getTime() : NaN;
-		},
 	};
+	const toText = () => {
+		return `from origin/${branch}`;
+	};
+	return createGenericOperation('pull', data, toText);
 }

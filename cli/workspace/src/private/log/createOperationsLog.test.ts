@@ -1,8 +1,9 @@
+import { createGenericOperation, createOperationSuccess } from '@art-lib/operations';
 import { describe, expect, it, vi } from 'vitest';
 
 import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
 import { createCloneOperation } from '../commands/operations/createCloneOperation.js';
-import { createOperationSuccess } from '../operations/createOperationSuccess.js';
+import { readCheckout } from '../present/private/readCheckout.js';
 import { createCheckout } from '../store/createCheckout.js';
 
 import { createOperationsLog } from './createOperationsLog.js';
@@ -18,19 +19,9 @@ function makeResolvedClone(name: string) {
 }
 
 function makePendingOperation() {
-	return {
-		ts: new Date(),
-		checkout: undefined,
-		outcome: 'pending' as const,
-		operation: 'clone' as const,
-		location: 'checkouts/my-repo',
-		message() {
-			return 'cloning my-repo';
-		},
-		timing() {
-			return NaN;
-		},
-	};
+	return createGenericOperation('clone', { location: 'checkouts/my-repo' }, () => {
+		return 'cloning my-repo';
+	});
 }
 
 describe('createOperationsLog', () => {
@@ -42,7 +33,7 @@ describe('createOperationsLog', () => {
 		const ops = operations.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].operation).toBe('clone');
-		expect(ops[0].checkout?.repo?.name).toBe('test');
+		expect(readCheckout(ops[0].data)?.repo?.name).toBe('test');
 	});
 
 	it('WHEN no operations are logged it returns an empty array', () => {
@@ -58,9 +49,9 @@ describe('createOperationsLog', () => {
 		await new Promise(resolve => setTimeout(resolve, 15));
 		operations.log(makeResolvedClone('b'));
 
-		const ops = operations.since(before);
+		const ops = operations.since(before.getTime());
 		expect(ops).toHaveLength(1);
-		expect(ops[0].checkout?.repo?.name).toBe('b');
+		expect(readCheckout(ops[0].data)?.repo?.name).toBe('b');
 	});
 
 	it('WHEN latest() receives a limit, it returns that many most recent operations', () => {
@@ -71,13 +62,13 @@ describe('createOperationsLog', () => {
 
 		const ops = operations.latest(2);
 		expect(ops).toHaveLength(2);
-		expect(ops[0].checkout?.repo?.name).toBe('b');
-		expect(ops[1].checkout?.repo?.name).toBe('c');
+		expect(readCheckout(ops[0].data)?.repo?.name).toBe('b');
+		expect(readCheckout(ops[1].data)?.repo?.name).toBe('c');
 	});
 
 	it('WHEN an operation is pending it is streamed to the logger without being stored', () => {
 		const logger = vi.fn();
-		const operations = createOperationsLog(logger);
+		const operations = createOperationsLog({ log: logger, setOutputMode: () => {} });
 
 		operations.log(makePendingOperation());
 

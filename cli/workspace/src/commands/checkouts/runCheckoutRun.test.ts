@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { readCheckout } from '../../private/present/private/readCheckout.js';
 import { makeCommandContextMock } from '../../test/helpers/context/makeCommandContextMock.js';
 import { makeGitBareRepo } from '../../test/helpers/git/makeGitBareRepo.js';
 import { makeGitRepoFromBare } from '../../test/helpers/git/makeGitRepoFromBare.js';
@@ -44,7 +45,7 @@ describe('checkouts run command', () => {
 		expect(ops).toHaveLength(1);
 		expect((ops[0].data as string[])[0]).toBe('checkouts run');
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toBe('No targets.');
+		expect(ops[0].text()).toBe('No targets.');
 		expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Usage: Use '));
 	});
 
@@ -95,7 +96,7 @@ describe('checkouts run command', () => {
 
 		const runOps = ctx.log.all().filter(op => op.operation === 'run');
 		expect(runOps).toHaveLength(1);
-		expect(runOps[0].checkout?.record.name).toBe('Art');
+		expect(readCheckout(runOps[0].data)?.record.name).toBe('Art');
 		expect(runOps[0].outcome).toBe('success');
 	});
 
@@ -119,7 +120,7 @@ describe('checkouts run command', () => {
 		const runOps = ctx.log.all().filter(op => op.operation === 'run');
 		expect(runOps).toHaveLength(2);
 		expect(runOps.map(op => op.outcome)).toEqual(['failure', 'failure']);
-		expect(String(runOps[0].message())).toContain('Exit code: 1');
+		expect(String(runOps[0].text())).toContain('Exit code: 1');
 	});
 
 	it('WHEN no checkout matches the pattern it warns and executes nothing', async () => {
@@ -143,6 +144,6 @@ describe('checkouts run command', () => {
 		const runOps = ctx.log.all().filter(op => op.operation === 'run');
 		expect(runOps).toHaveLength(1);
 		expect(runOps[0].outcome).toBe('failure');
-		expect(String(runOps[0].message())).toContain('checkout not cloned');
+		expect(String(runOps[0].text())).toContain('checkout not cloned');
 	});
 });

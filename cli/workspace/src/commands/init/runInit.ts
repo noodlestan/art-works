@@ -1,8 +1,9 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
 
 const MANIFEST_FILE = '.art-workspace.mts';
 

@@ -1,5 +1,6 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
 import { presentCheckoutRepositoryState } from '../../private/present/presentCheckoutRepositoryState.js';
 import { presentPackageStateReport } from '../../private/present/presentPackageStateReport.js';
 import { getRepositoryCheckoutPackages } from '../../private/repositories/getRepositoryCheckoutPackages.js';

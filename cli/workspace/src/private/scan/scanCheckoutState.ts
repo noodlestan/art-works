@@ -1,6 +1,8 @@
 import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { createOperationFailure } from '@art-lib/operations';
+
 import type { WorkspaceContext } from '../context/createWorkspaceContext.js';
 import { getBehindAheadCount } from '../git/getBehindAheadCount.js';
 import { getCurrentBranch } from '../git/getCurrentBranch.js';
@@ -11,12 +13,11 @@ import { hasRemote } from '../git/hasRemote.js';
 import { isDetachedHead } from '../git/isDetachedHead.js';
 import { isDirty } from '../git/isDirty.js';
 import { remoteFetch } from '../git/remoteFetch.js';
-import { createGenericOperation } from '../operations/createGenericOperation.js';
-import { createOperationFailure } from '../operations/createOperationFailure.js';
 import type { Checkout } from '../store/types.js';
 
 import { createCheckoutNoClonedScan } from './private/createCheckoutNoClonedScan.js';
 import { createCheckoutScan } from './private/createCheckoutScan.js';
+import { createScanCheckoutStateOperation } from './private/createScanCheckoutStateOperation.js';
 import { createCommittedState } from './states/createCommittedState.js';
 import { createExistsState } from './states/createExistsState.js';
 import { createGitDirState } from './states/createGitDirState.js';
@@ -37,8 +38,8 @@ export async function scanCheckoutState(
 	} catch {
 		return { ...checkout, scan: createCheckoutNoClonedScan(Boolean(checkout.repo)) };
 	}
-
-	ctx.log.log(createGenericOperation('scan-checkout-state', checkout.record.location));
+	const pending = createScanCheckoutStateOperation(checkout);
+	ctx.log.log(pending);
 
 	let hasGitDir = false;
 	try {
@@ -81,12 +82,7 @@ export async function scanCheckoutState(
 				}
 			}
 		} catch (error) {
-			ctx.log.log(
-				createOperationFailure(
-					createGenericOperation('scan-checkout-state', checkout.record.location),
-					error,
-				),
-			);
+			ctx.log.log(createOperationFailure(pending, error));
 		}
 	}
 

@@ -70,9 +70,9 @@ hydrate(ctx)
 Detailed definitions live in `knowledge/design/operations-log.md`. Symbols relevant to the use cases below:
 
 - **OperationsLog** — append-only: `log(operation)`, `all()`, `since(ts)`, `latest(n)`
-- **Operation** — `operation` kind, `ts`, `checkout`, `outcome` (success/failure), `message()`
+- **Operation** — `operation` kind, `ts`, `outcome` (pending/success/failure), `text()`, and a payload carrying the kind-specific fields and the checkout
 - **Kinds** — `clone`, `push`, `pull`, `publish`, `branch`, `linked`, `unlink`, `run`
-- **Factories** — per-kind operation factories in `src/private/commands/operations/`: `createCloneOperation`, `createPushOperation`, `createPullOperation`, `createBranchOperation`, `createLinkedOperation`, `createPublishOperation`, `createUnlinkOperation`, `createCheckoutRunOperation`; plus generic ones in `src/private/operations/`: `createGenericOperation(operation, data)` / `createOperationSuccess(pending, message?)` / `createOperationFailure(pending, error)`. Each operation logs a pending instance; success/failure are derived from it via the generic factories. Read-only commands (`repo`, `links`) never log operations — their failures surface as report states.
+- **Factories** — per-kind operation factories in `src/private/commands/operations/`: `createCloneOperation`, `createPushOperation`, `createPullOperation`, `createBranchOperation`, `createLinkedOperation`, `createPublishOperation`, `createUnlinkOperation`, `createCheckoutRunOperation`; plus generic ones in `src/private/operations/`: `createGenericOperation(operation, data)` / `createOperationSuccess(pending, text?)` / `createOperationFailure(pending, error)`. Each operation logs a pending instance; success/failure are derived from it via the generic factories. Read-only commands (`repo`, `links`) never log operations — their failures surface as report states.
 
 ## Reports
 
@@ -792,7 +792,7 @@ pushCheckout(ctx, checkout)
     ctx.log.log(createOperationSuccess(pending))
   catch error:
     op = createOperationFailure(pending, error)
-    updated = { ...checkout, issues: [...checkout.issues, op.message()] }
+    updated = { ...checkout, issues: [...checkout.issues, op.text()] }
     ctx.store.updateCheckout(updated)
     ctx.log.log(op)
 ```

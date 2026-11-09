@@ -1,8 +1,8 @@
 import { createRecordsDocument } from '@art-js/records';
 import type { FSRecordFile } from '@art-lib/fs-records';
+import { createGenericOperation } from '@art-lib/operations';
 
 import type { WorkspaceContext } from '../../context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../operations/createGenericOperation.js';
 import type { RepositoryCheckoutRecordHandle } from '../../store/hydrateStoreFromRecords.js';
 import type { CheckoutRecord, RepositoryRecord } from '../types.js';
 

@@ -1,83 +1,98 @@
 import type {
-	OperationBase as SharedOperationBase,
-	OperationOutcome as SharedOperationOutcome,
-} from '@art-lib/operations/model';
+	OperationFailure as SharedOperationFailure,
+	OperationPending as SharedOperationPending,
+	OperationSuccess as SharedOperationSuccess,
+} from '@art-lib/operations';
 
 import type { Checkout } from '../store/createCheckout.js';
 
 export type CheckoutOp =
 	'clone' | 'push' | 'pull' | 'publish' | 'branch' | 'linked' | 'unlink' | 'run';
 
-export type OperationOutcome = SharedOperationOutcome;
-
-export interface OperationBase extends Omit<
-	SharedOperationBase,
-	'ts' | 'finishedTs' | 'level' | 'text'
-> {
-	ts: Date; // created when the pending op is logged
-	finishedTs?: Date; // set when the op resolves (success/failure)
-	checkout?: Checkout; // CLI presentation: the checkout an operation ran against
-}
-
-export interface OperationPending extends OperationBase {
-	outcome: 'pending';
-	data?: unknown;
-}
-
-export interface OperationSuccess extends OperationBase {
-	outcome: 'success';
-	data?: unknown;
-}
-
-export interface OperationFailure extends OperationBase {
-	outcome: 'failure';
-	error: string;
-	errorSerialized: () => string;
-	data?: unknown;
-}
-
-export interface ClonePending extends OperationPending {
-	operation: 'clone';
+/** The payload of each command operation; `checkout` rides inside `data`. */
+export type CloneData = {
+	checkout?: Checkout;
 	location: string;
-}
+};
 
-export interface PushPending extends OperationPending {
-	operation: 'push';
+export type PushData = {
+	checkout?: Checkout;
 	branch: string;
-}
+};
 
-export interface PullPending extends OperationPending {
-	operation: 'pull';
+export type PullData = {
+	checkout?: Checkout;
 	branch: string;
-}
+};
 
-export interface PublishPending extends OperationPending {
-	operation: 'publish';
+export type PublishData = {
+	checkout?: Checkout;
 	package: string;
 	version: string;
-}
+};
 
-export interface BranchPending extends OperationPending {
-	operation: 'branch';
+export type BranchData = {
+	checkout?: Checkout;
 	branch: string;
-}
+};
 
-export interface LinkedPending extends OperationPending {
-	operation: 'linked';
+export type LinkedData = {
+	checkout?: Checkout;
 	package: string;
 	target: string;
-}
+};
 
-export interface UnlinkPending extends OperationPending {
-	operation: 'unlink';
+export type UnlinkData = {
+	checkout?: Checkout;
 	package: string;
 	source: string;
-}
+};
 
-export interface CheckoutRunPending extends OperationPending {
-	operation: 'run';
+export type CheckoutRunData = {
+	checkout?: Checkout;
 	command: string;
-}
+};
+
+export type ScanCheckoutStateData = {
+	checkout: Checkout;
+	location: string;
+};
+
+export type ClonePending = SharedOperationPending<CloneData> & {
+	operation: 'clone';
+};
+
+export type PushPending = SharedOperationPending<PushData> & {
+	operation: 'push';
+};
+
+export type PullPending = SharedOperationPending<PullData> & {
+	operation: 'pull';
+};
+
+export type PublishPending = SharedOperationPending<PublishData> & {
+	operation: 'publish';
+};
+
+export type BranchPending = SharedOperationPending<BranchData> & {
+	operation: 'branch';
+};
+
+export type LinkedPending = SharedOperationPending<LinkedData> & {
+	operation: 'linked';
+};
+
+export type UnlinkPending = SharedOperationPending<UnlinkData> & {
+	operation: 'unlink';
+};
+
+export type CheckoutRunPending = SharedOperationPending<CheckoutRunData> & {
+	operation: 'run';
+};
+
+export type ScanCheckoutStatePending = SharedOperationPending<ScanCheckoutStateData> & {
+	operation: 'scan-checkout-state';
+};
 
 export type Operation =
 	| ClonePending
@@ -88,6 +103,6 @@ export type Operation =
 	| LinkedPending
 	| UnlinkPending
 	| CheckoutRunPending
-	| OperationPending
-	| OperationSuccess
-	| OperationFailure;
+	| SharedOperationPending
+	| SharedOperationSuccess
+	| SharedOperationFailure;

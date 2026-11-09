@@ -140,7 +140,7 @@ describe('sanity command', () => {
 		const ops = ctx.log.all();
 		expect(ops.length).toEqual(1);
 		expect(ops[0].operation).toEqual('push');
-		expect(ops[0].message()).toEqual('to origin/main');
+		expect(ops[0].text()).toEqual('to origin/main');
 	});
 
 	it('WHEN --auto is set it does not push a dirty repo', async () => {

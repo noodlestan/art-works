@@ -92,7 +92,7 @@ describe('clone command', () => {
 		const ops = ctx.log.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toContain('Unknown');
+		expect(ops[0].text()).toContain('Unknown');
 	});
 
 	it('WHEN --all is passed it clones all repos', async () => {

@@ -38,7 +38,7 @@ describe('doCheckoutRun', () => {
 		const ops = ctx.log.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toContain('checkout not cloned');
+		expect(ops[0].text()).toContain('checkout not cloned');
 	});
 
 	it('WHEN the checkout exists it runs the command and logs success', async () => {
@@ -73,7 +73,7 @@ describe('doCheckoutRun', () => {
 		expect(result).not.toBeNull();
 		const failure = ctx.log.all().find(op => op.outcome === 'failure');
 		expect(failure).toBeDefined();
-		expect(failure?.message()).toContain('Exit code: 1');
+		expect(failure?.text()).toContain('Exit code: 1');
 	});
 
 	it('WHEN a successful command produces no output it prints [No output]', async () => {

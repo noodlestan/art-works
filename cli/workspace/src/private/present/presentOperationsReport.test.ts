@@ -1,3 +1,8 @@
+import {
+	createGenericOperation,
+	createOperationFailure,
+	createOperationSuccess,
+} from '@art-lib/operations';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeCommandContextMock } from '../../test/helpers/context/makeCommandContextMock.js';
@@ -5,8 +10,6 @@ import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
 import { createCloneOperation } from '../commands/operations/createCloneOperation.js';
 import { createOperationsLog } from '../log/createOperationsLog.js';
-import { createOperationFailure } from '../operations/createOperationFailure.js';
-import { createOperationSuccess } from '../operations/createOperationSuccess.js';
 import type { ClonePending } from '../operations/types.js';
 import { createCheckout } from '../store/createCheckout.js';
 
@@ -14,19 +17,9 @@ import { makeOperationLogLine } from './makeOperationLogLine.js';
 import { presentOperationsReport } from './presentOperationsReport.js';
 
 function makeClonePendingOperationMock(): ClonePending {
-	return {
-		ts: new Date(),
-		checkout: undefined,
-		outcome: 'pending',
-		operation: 'clone',
-		location: 'checkouts/my-repo',
-		message() {
-			return 'cloning my-repo';
-		},
-		timing() {
-			return NaN;
-		},
-	};
+	return createGenericOperation('clone', { location: 'checkouts/my-repo' }, () => {
+		return 'cloning my-repo';
+	});
 }
 
 const tempDirs: string[] = [];

@@ -39,7 +39,7 @@ describe('branch command', () => {
 		expect(ops).toHaveLength(1);
 		expect((ops[0].data as string[])[0]).toBe('branch');
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toBe('No targets.');
+		expect(ops[0].text()).toBe('No targets.');
 		expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Usage: Use '));
 	});
 
@@ -62,7 +62,7 @@ describe('branch command', () => {
 		expect(ops).toHaveLength(1);
 		expect(ops[0].operation).toBe('branch');
 		expect(ops[0].outcome).toBe('success');
-		expect(ops[0].message()).toBe('created feat/x');
+		expect(ops[0].text()).toBe('created feat/x');
 	});
 
 	it('WHEN no checkouts are specified it branches all checkouts', async () => {
@@ -121,7 +121,7 @@ describe('branch command', () => {
 		const failure = ops.find(o => o.outcome === 'failure');
 		expect(failure).toBeDefined();
 		expect(failure?.operation).toBe('branch');
-		expect(failure?.message()).toContain('not cloned');
+		expect(failure?.text()).toContain('not cloned');
 		expect(ctx.store.getCheckoutOfRepo('Good')?.record.branch).toBe('main');
 	});
 
@@ -140,7 +140,7 @@ describe('branch command', () => {
 		expect(checkout?.record.branch).toBe('feat/x');
 		expect(ctx.log.all()).toHaveLength(1);
 		expect(ctx.log.all()[0].outcome).toBe('success');
-		expect(ctx.log.all()[0].message()).toBe('created feat/x');
+		expect(ctx.log.all()[0].text()).toBe('created feat/x');
 	});
 
 	it('WHEN the branch already exists it switches to it', async () => {
@@ -160,7 +160,7 @@ describe('branch command', () => {
 		const ops = ctx.log.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].outcome).toBe('success');
-		expect(ops[0].message()).toBe('switched to feat/x');
+		expect(ops[0].text()).toBe('switched to feat/x');
 		expect(ctx.store.getCheckoutOfRepo('One')?.record.branch).toBe('feat/x');
 	});
 

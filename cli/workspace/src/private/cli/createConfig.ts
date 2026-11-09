@@ -1,10 +1,11 @@
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
+import { createGenericOperation } from '@art-lib/operations';
+
 import { loadWorkspaceConfig } from '../../config/loadWorkspaceConfig.js';
 import type { WorkspaceConfig } from '../../config/types.js';
 import type { LoggerAPI as Logger } from '../logger/createLogger.js';
-import { createGenericOperation } from '../operations/createGenericOperation.js';
 
 const MANIFEST_FILE = '.art-workspace.mts';
 

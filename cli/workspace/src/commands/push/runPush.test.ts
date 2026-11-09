@@ -42,7 +42,7 @@ describe('push command', () => {
 		expect(ops).toHaveLength(1);
 		expect((ops[0].data as string[])[0]).toBe('push');
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toBe('No targets.');
+		expect(ops[0].text()).toBe('No targets.');
 		expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Usage: Use '));
 	});
 
@@ -67,7 +67,7 @@ describe('push command', () => {
 		expect(ops).toHaveLength(1);
 		expect(ops[0].operation).toBe('push');
 		expect(ops[0].outcome).toBe('success');
-		expect(ops[0].message()).toBe('to origin/main');
+		expect(ops[0].text()).toBe('to origin/main');
 
 		const verifyDir = makeTempDir(tempDirs);
 		await simpleGit(verifyDir).clone(bareDir, verifyDir);

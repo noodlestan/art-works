@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { simpleGit } from 'simple-git';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import type { Operation } from '../../private/operations/types.js';
 import { loadCheckoutRecords } from '../../private/resources/checkout/loadCheckoutRecords.js';
 import { loadRepositoryRecords } from '../../private/resources/repository/loadRepositoryRecords.js';
 import { hydrateStoreFromRecords } from '../../private/store/hydrateStoreFromRecords.js';
@@ -32,8 +33,8 @@ describe('cloneSpecific', () => {
 		await cloneSpecific(ctx, [], 'nope');
 
 		expect(logSpy).toHaveBeenCalledTimes(1);
-		const op = logSpy.mock.calls[0][0];
-		expect(op.message()).toContain('unknown repo "nope"');
+		const op = logSpy.mock.calls[0][0] as Operation;
+		expect(op.text()).toContain('unknown repo "nope"');
 	});
 
 	it('WHEN the repo is missing it clones it and creates the checkout record', async () => {
@@ -129,7 +130,7 @@ describe('cloneSpecific', () => {
 		const ops = ctx.log.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toContain("location one-custom is already used by checkout 'Two'.");
+		expect(ops[0].text()).toContain("location one-custom is already used by checkout 'Two'.");
 	});
 
 	it('WHEN the target directory exists on disk it logs a failure', async () => {
@@ -146,6 +147,6 @@ describe('cloneSpecific', () => {
 		const ops = ctx.log.all();
 		expect(ops).toHaveLength(1);
 		expect(ops[0].outcome).toBe('failure');
-		expect(ops[0].message()).toContain('directory already exists at');
+		expect(ops[0].text()).toContain('directory already exists at');
 	});
 });

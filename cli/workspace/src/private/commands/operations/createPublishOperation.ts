@@ -1,3 +1,5 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { PublishPending } from '../../operations/types.js';
 import type { Checkout } from '../../store/createCheckout.js';
 
@@ -6,18 +8,13 @@ export function createPublishOperation(
 	pkg: string,
 	version: string,
 ): PublishPending {
-	return {
-		ts: new Date(),
+	const data = {
 		checkout,
-		outcome: 'pending',
-		operation: 'publish',
 		package: pkg,
 		version,
-		message() {
-			return `publishing ${pkg}@${version}`;
-		},
-		timing() {
-			return this.finishedTs ? this.finishedTs.getTime() - this.ts.getTime() : NaN;
-		},
 	};
+	const toText = () => {
+		return `publishing ${pkg}@${version}`;
+	};
+	return createGenericOperation('publish', data, toText);
 }

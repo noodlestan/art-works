@@ -1,6 +1,7 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import { runWithConcurrency } from '../async/runWithConcurrency.js';
 import type { WorkspaceContext } from '../context/createWorkspaceContext.js';
-import { createGenericOperation } from '../operations/createGenericOperation.js';
 import { scanCheckoutState } from '../scan/scanCheckoutState.js';
 
 export async function scanAllCheckoutsStates(

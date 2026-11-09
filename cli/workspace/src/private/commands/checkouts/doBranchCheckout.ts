@@ -1,7 +1,7 @@
+import { createOperationFailure, createOperationSuccess } from '@art-lib/operations';
+
 import type { WorkspaceContext } from '../../context/createWorkspaceContext.js';
 import { createOrSwitchBranch } from '../../git/createOrSwitchBranch.js';
-import { createOperationFailure } from '../../operations/createOperationFailure.js';
-import { createOperationSuccess } from '../../operations/createOperationSuccess.js';
 import { upsertCheckoutRecord } from '../../resources/checkout/upsertCheckoutRecord.js';
 import type { Checkout } from '../../store/createCheckout.js';
 import { createBranchOperation } from '../operations/createBranchOperation.js';

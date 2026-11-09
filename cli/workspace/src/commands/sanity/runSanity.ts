@@ -1,7 +1,8 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import { scanWorkspaceCheckout } from '../../private/commands/workspaces/scanWorkspaceCheckout.js';
 import { syncWorkspaceCheckout } from '../../private/commands/workspaces/syncWorkspaceCheckout.js';
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentExtraneousReport } from '../../private/present/presentExtraneousReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';

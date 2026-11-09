@@ -1,8 +1,8 @@
+import { createGenericOperation, createOperationFailure } from '@art-lib/operations';
+
 import { doBranchCheckout } from '../../private/commands/checkouts/doBranchCheckout.js';
 import { createBranchOperation } from '../../private/commands/operations/createBranchOperation.js';
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
-import { createOperationFailure } from '../../private/operations/createOperationFailure.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';
 import { loadCheckoutRecords } from '../../private/resources/checkout/loadCheckoutRecords.js';

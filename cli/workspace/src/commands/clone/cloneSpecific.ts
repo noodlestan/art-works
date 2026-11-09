@@ -1,9 +1,10 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { createOperationFailure } from '@art-lib/operations';
+
 import { createCloneOperation } from '../../private/commands/operations/createCloneOperation.js';
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createOperationFailure } from '../../private/operations/createOperationFailure.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';
 import { upsertCheckoutRecord } from '../../private/resources/checkout/upsertCheckoutRecord.js';

@@ -18,12 +18,11 @@ Append-only log of the side effects performed during a command invocation. Creat
 A single recorded side effect. Operations are typed by kind and carry a pending, success, or failure outcome:
 
 - **`operation`** — one of: `clone`, `push`, `pull`, `publish`, `branch`, `linked`, `unlink`, `run`.
-- **`ts`** — timestamp; `finishedTs` set when the operation resolves.
-- **`checkout`** — the checkout the operation targeted.
+- **`ts`** — creation time; `finishedTs` is set when the operation resolves.
 - **`outcome`** — `pending`, `success`, or `failure`; failures carry an error.
 - **`timing()`** — `finishedTs - ts` in ms, `NaN` while pending.
-- **detail** — kind-specific fields (e.g. location for clone, branch for push, package + version for publish) and a `message()` for reporting.
+- **payload** — the kind-specific fields (location for clone, branch for push, package and version for publish), the checkout the operation targeted, and the text to report.
 
-Success and failure are derived generically from the pending instance via `createOperationSuccess(pending, message?)` / `createOperationFailure(pending, error)` rather than per-kind factories.
+Success and failure are derived generically from the pending instance via `createOperationSuccess(pending, text?)` / `createOperationFailure(pending, error)` rather than per-kind factories.
 
 Reports are presented separately — see `reports.md`.

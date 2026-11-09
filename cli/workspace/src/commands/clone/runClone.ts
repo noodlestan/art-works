@@ -1,5 +1,6 @@
+import { createGenericOperation } from '@art-lib/operations';
+
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
-import { createGenericOperation } from '../../private/operations/createGenericOperation.js';
 import { loadCheckoutRecords } from '../../private/resources/checkout/loadCheckoutRecords.js';
 import { loadRepositoryRecords } from '../../private/resources/repository/loadRepositoryRecords.js';
 import { hydrateStoreFromRecords } from '../../private/store/hydrateStoreFromRecords.js';
