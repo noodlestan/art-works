@@ -7,7 +7,7 @@ import { makeOperationLogLine } from '../present/makeOperationLogLine.js';
 
 export interface LoggerAPI {
 	log(op: Operation): void;
-	setOutputMode(mode: string | undefined): void;
+	setOutputMode(mode: OutputMode): void;
 }
 
 /** A `Message` carrying the operation its log line is rendered from. */
@@ -50,8 +50,13 @@ function toMessage(op: Operation): OperationMessage {
 	};
 }
 
-function toOutputMode(mode: string | undefined): OutputMode {
-	return mode === 'verbose' ? 'verbose' : 'quiet';
+/**
+ * Converts the raw `-o` argv string once, at the commander boundary: the rest
+ * of the CLI only ever sees an `OutputMode`. Anything but `quiet` or `verbose`
+ * falls back to `normal`.
+ */
+export function parseOutputMode(value?: string): OutputMode {
+	return value === 'quiet' || value === 'verbose' ? value : 'normal';
 }
 
 export function createLogger(): LoggerAPI {
@@ -64,8 +69,8 @@ export function createLogger(): LoggerAPI {
 		log(op: Operation): void {
 			logger.log(toMessage(op));
 		},
-		setOutputMode(mode: string | undefined): void {
-			logger.setOutputMode(toOutputMode(mode));
+		setOutputMode(mode: OutputMode): void {
+			logger.setOutputMode(mode);
 		},
 	};
 }
