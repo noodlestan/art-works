@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 0.3.2
+
+### Changed
+
+- Use published `@art-lib/logger` and `@art-lib/operations` for logging and operation tracking.
+- Refactor command and report code to use the shared operation model.
+
+### Tested
+
+- Expand command and reporting coverage, including real `clone --all` with local repositories and concurrency behavior.
+
 ## 0.3.1
 
 ### Changed
