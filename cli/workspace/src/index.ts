@@ -13,8 +13,9 @@ import { runRepo } from './commands/repo/runRepo.js';
 import { runSanity } from './commands/sanity/runSanity.js';
 import { runSync } from './commands/sync/runSync.js';
 import { runUnlink } from './commands/unlink/runUnlink.js';
+import { parseConfigDebugOption } from './options/parseConfigDebugOption.js';
+import { parseOutputModeOption } from './options/parseOutputModeOption.js';
 import { createCommandContext } from './private/context/createCommandContext.js';
-import { parseOutputMode } from './private/logger/createLogger.js';
 
 const program = new Command();
 
@@ -35,8 +36,8 @@ program
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		const created = await runInit(ctx, { root });
@@ -53,12 +54,14 @@ program
 	.description('Check git status across all repos')
 	.option('-a, --auto', 'push clean unpushed repos')
 	.option('-r, --refetch', 'fetch ahead/behind data from remote')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (options: SanityOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		const auto = options.auto ?? false;
@@ -72,6 +75,8 @@ program
 	.command('clone')
 	.description('Clone repos from manifest')
 	.option('-a, --all', 'clone all repos')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.argument('[name]', 'repo name to clone')
 	.argument('[target]', 'target location (relative to checkouts path)')
 	.action(
@@ -84,8 +89,8 @@ program
 			const root = process.cwd();
 			const ctx = await createCommandContext(
 				root,
-				command,
-				parseOutputMode(command.optsWithGlobals().output),
+				parseConfigDebugOption(command),
+				parseOutputModeOption(command),
 			);
 
 			await runClone(ctx, { all: options.all, repoName, checkoutInput });
@@ -103,12 +108,14 @@ program
 		'One or more. Matches checkout name and location. Wildcard asterisk * supported. Example: -c "* @ refactor" "lib-*"',
 	)
 	.option('-a, --all', 'Apply to all checkouts')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (branch: string, options: BranchOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runBranch(ctx, { branch, checkouts: options.checkouts, all: options.all });
@@ -125,12 +132,14 @@ program
 	)
 	.option('-a, --all', 'Apply to all checkouts')
 	.option('-w, --workspace', 'Also apply the command to the workspace root')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (options: PullOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runPull(ctx, {
@@ -151,12 +160,14 @@ program
 	)
 	.option('-a, --all', 'Apply to all checkouts')
 	.option('-w, --workspace', 'Also apply the command to the workspace root')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (options: PushOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runPush(ctx, {
@@ -177,12 +188,14 @@ program
 	)
 	.option('-a, --all', 'Apply to all checkouts')
 	.option('-w, --workspace', 'Also apply the command to the workspace root')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (options: SyncOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runSync(ctx, {
@@ -205,12 +218,14 @@ program
 		'One or more. Matches checkout name and location. Wildcard asterisk * supported. Example: -c "* @ refactor" "lib-*"',
 	)
 	.option('-a, --all', 'Apply to all checkouts')
+	.option('--no-config-cache', 'Ignore the config cache and recompile the config')
+	.option('-o, --output <mode>', 'One of quiet | normal(default) | verbose')
 	.action(async (shellCommand: string, options: CheckoutsRunOptions, command: Command) => {
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runCheckoutsRun(ctx, {
@@ -230,8 +245,8 @@ program
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runRepo(ctx, { locations });
@@ -246,8 +261,8 @@ program
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runLink(ctx, { root });
@@ -262,8 +277,8 @@ program
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runUnlink(ctx, { root });
@@ -279,8 +294,8 @@ program
 		const root = process.cwd();
 		const ctx = await createCommandContext(
 			root,
-			command,
-			parseOutputMode(command.optsWithGlobals().output),
+			parseConfigDebugOption(command),
+			parseOutputModeOption(command),
 		);
 
 		await runPublish(ctx, { root, auto: options.auto });

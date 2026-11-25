@@ -1,8 +1,4 @@
-import type {
-	OperationFailure as SharedOperationFailure,
-	OperationPending as SharedOperationPending,
-	OperationSuccess as SharedOperationSuccess,
-} from '@art-lib/operations';
+import type { OperationFailure, OperationPending, OperationSuccess } from '@art-lib/operations';
 
 import type { Checkout } from '../store/createCheckout.js';
 
@@ -58,39 +54,39 @@ export type ScanCheckoutStateData = {
 	location: string;
 };
 
-export type ClonePending = SharedOperationPending<CloneData> & {
+export type ClonePending = OperationPending<CloneData> & {
 	operation: 'clone';
 };
 
-export type PushPending = SharedOperationPending<PushData> & {
+export type PushPending = OperationPending<PushData> & {
 	operation: 'push';
 };
 
-export type PullPending = SharedOperationPending<PullData> & {
+export type PullPending = OperationPending<PullData> & {
 	operation: 'pull';
 };
 
-export type PublishPending = SharedOperationPending<PublishData> & {
+export type PublishPending = OperationPending<PublishData> & {
 	operation: 'publish';
 };
 
-export type BranchPending = SharedOperationPending<BranchData> & {
+export type BranchPending = OperationPending<BranchData> & {
 	operation: 'branch';
 };
 
-export type LinkedPending = SharedOperationPending<LinkedData> & {
+export type LinkedPending = OperationPending<LinkedData> & {
 	operation: 'linked';
 };
 
-export type UnlinkPending = SharedOperationPending<UnlinkData> & {
+export type UnlinkPending = OperationPending<UnlinkData> & {
 	operation: 'unlink';
 };
 
-export type CheckoutRunPending = SharedOperationPending<CheckoutRunData> & {
+export type CheckoutRunPending = OperationPending<CheckoutRunData> & {
 	operation: 'run';
 };
 
-export type ScanCheckoutStatePending = SharedOperationPending<ScanCheckoutStateData> & {
+export type ScanCheckoutStatePending = OperationPending<ScanCheckoutStateData> & {
 	operation: 'scan-checkout-state';
 };
 
@@ -103,6 +99,6 @@ export type Operation =
 	| LinkedPending
 	| UnlinkPending
 	| CheckoutRunPending
-	| SharedOperationPending
-	| SharedOperationSuccess
-	| SharedOperationFailure;
+	| OperationPending
+	| OperationSuccess
+	| OperationFailure;

@@ -3,9 +3,9 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCheckoutScanMock } from '../../../test/helpers/checkout/makeCheckoutScanMock.js';
-import { makeWorkspaceCheckoutMock } from '../../../test/helpers/checkout/makeWorkspaceCheckoutMock.js';
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { makeCheckoutScanFixture } from '../../../test/helpers/checkout/makeCheckoutScanFixture.js';
+import { makeWorkspaceCheckoutFixture } from '../../../test/helpers/checkout/makeWorkspaceCheckoutFixture.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { advanceBareRepoByOneCommit } from '../../../test/helpers/git/advanceBareRepoByOneCommit.js';
 import { advanceGitRepoByOneCommit } from '../../../test/helpers/git/advanceGitRepoByOneCommit.js';
 import { makeGitBareRepo } from '../../../test/helpers/git/makeGitBareRepo.js';
@@ -33,9 +33,9 @@ describe('syncWorkspaceCheckout', () => {
 		// Also make workspace ahead with a local commit.
 		await advanceGitRepoByOneCommit(workspaceDir, 'local-commit.txt');
 
-		const ctx = makeCommandContextMock(
+		const ctx = createWorkspaceContextMock(
 			workspaceDir,
-			makeWorkspaceCheckoutMock(workspaceDir, { scan: makeCheckoutScanMock(['behind']) }),
+			makeWorkspaceCheckoutFixture(workspaceDir, { scan: makeCheckoutScanFixture(['behind']) }),
 		);
 
 		await syncWorkspaceCheckout(ctx);
@@ -45,12 +45,26 @@ describe('syncWorkspaceCheckout', () => {
 		expect(ctx.workspace?.scan?.state('sync').ahead).toBe(0);
 		expect(existsSync(join(workspaceDir, 'remote-commit.txt'))).toBe(true);
 
-		const ops = ctx.log.all();
-		expect(ops).toHaveLength(2);
-		expect(ops[0].operation).toBe('pull');
-		expect(ops[0].outcome).toBe('success');
-		expect(ops[1].operation).toBe('push');
-		expect(ops[1].outcome).toBe('success');
+		const expectedPullPendingOp = expect.objectContaining({
+			operation: 'pull',
+			outcome: 'pending',
+		});
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPullPendingOp);
+		const expectedPullSuccessOp = expect.objectContaining({
+			operation: 'pull',
+			outcome: 'success',
+		});
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPullSuccessOp);
+		const expectedPushPendingOp = expect.objectContaining({
+			operation: 'push',
+			outcome: 'pending',
+		});
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPushPendingOp);
+		const expectedPushSuccessOp = expect.objectContaining({
+			operation: 'push',
+			outcome: 'success',
+		});
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPushSuccessOp);
 	});
 
 	it('WHEN the workspace cannot pull it skips the pull', async () => {
@@ -59,23 +73,23 @@ describe('syncWorkspaceCheckout', () => {
 		await makeGitRepoFromBare(tempDirs, bareDir, { dir: workspaceDir });
 		await advanceGitRepoByOneCommit(workspaceDir, 'ahead.txt');
 
-		const ctx = makeCommandContextMock(
+		const ctx = createWorkspaceContextMock(
 			workspaceDir,
-			makeWorkspaceCheckoutMock(workspaceDir, { scan: makeCheckoutScanMock(['ahead']) }),
+			makeWorkspaceCheckoutFixture(workspaceDir, { scan: makeCheckoutScanFixture(['ahead']) }),
 		);
 
 		await syncWorkspaceCheckout(ctx);
 
-		const ops = ctx.log.all();
 		// Only push operation
-		expect(ops.some(o => o.operation === 'push')).toBe(true);
+		const expectedPushOp = expect.objectContaining({ operation: 'push', outcome: 'success' });
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPushOp);
 	});
 
 	it('WHEN there is no workspace in context it throws', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		await expect(syncWorkspaceCheckout(ctx)).rejects.toThrow('No workspace in context.');
-		expect(ctx.log.all()).toHaveLength(0);
+		expect(ctx.operations.log).not.toHaveBeenCalled();
 	});
 });

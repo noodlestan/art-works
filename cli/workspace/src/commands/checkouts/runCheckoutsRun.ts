@@ -23,10 +23,10 @@ export async function runCheckoutsRun(
 	);
 
 	const pending = createGenericOperation('command', ['checkouts run', options]);
-	ctx.log.log(pending);
+	ctx.operations.log(pending);
 
 	if (!options.all && (!options.checkouts || options.checkouts.length === 0)) {
-		ctx.log.log(createOperationFailure(pending, 'No targets.'));
+		ctx.operations.log(createOperationFailure(pending, 'No targets.'));
 		console.error(
 			`\nUsage: Use \`checkouts run <command> -c <pattern>\` to match specific checkouts or \`checkouts run <command> --all\` if you want to apply the command to all checkouts.\n`,
 		);
@@ -43,5 +43,5 @@ export async function runCheckoutsRun(
 	});
 
 	presentCheckoutReport(ctx.config, checkouts);
-	presentOperationsReport(ctx.log);
+	presentOperationsReport(ctx.operations);
 }

@@ -2,9 +2,9 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCheckoutMock } from '../../../test/helpers/checkout/makeCheckoutMock.js';
-import { makeCheckoutScanMock } from '../../../test/helpers/checkout/makeCheckoutScanMock.js';
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { makeCheckoutFixture } from '../../../test/helpers/checkout/makeCheckoutFixture.js';
+import { makeCheckoutScanFixture } from '../../../test/helpers/checkout/makeCheckoutScanFixture.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeGitRepo } from '../../../test/helpers/git/makeGitRepo.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
@@ -21,20 +21,21 @@ afterEach(async () => {
 describe('doPushCheckout', () => {
 	it('WHEN the checkout has no remote pushing logs a failure operation', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 		const repoDir = join(workspaceDir, ctx.config.checkouts.path, 'my-repo');
 		await makeGitRepo(tempDirs, { commit: true, dir: repoDir });
 
-		const checkout = makeCheckoutMock({
+		const checkout = makeCheckoutFixture({
 			path: repoDir,
 			repo: { name: 'MyRepo', remote: 'git@example.com:my-repo.git' },
 		});
-		checkout.scan = makeCheckoutScanMock(['no-remote']);
+		checkout.scan = makeCheckoutScanFixture(['no-remote']);
 
 		await doPushCheckout(ctx, checkout);
 
-		const ops = ctx.log.all();
-		expect(ops).toHaveLength(1);
-		expect(ops[0].outcome).toBe('failure');
+		const expectedPendingOp = expect.objectContaining({ operation: 'push', outcome: 'pending' });
+		expect(ctx.operations.log).toHaveBeenNthCalledWith(1, expectedPendingOp);
+		const expectedFailureOp = expect.objectContaining({ operation: 'push', outcome: 'failure' });
+		expect(ctx.operations.log).toHaveBeenNthCalledWith(2, expectedFailureOp);
 	});
 });

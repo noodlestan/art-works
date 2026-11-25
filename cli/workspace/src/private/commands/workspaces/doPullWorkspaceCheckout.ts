@@ -2,9 +2,9 @@ import { createOperationFailure, createOperationSuccess } from '@art-lib/operati
 import { simpleGit } from 'simple-git';
 
 import type { WorkspaceContext } from '../../context/createWorkspaceContext.js';
+import { createPullOperation } from '../../operations/createPullOperation.js';
 import { scanCheckoutState } from '../../scan/scanCheckoutState.js';
 import type { Checkout } from '../../store/createCheckout.js';
-import { createPullOperation } from '../operations/createPullOperation.js';
 
 export async function doPullWorkspaceCheckout(ctx: WorkspaceContext): Promise<Checkout | null> {
 	const workspace = ctx.workspace;
@@ -18,15 +18,14 @@ export async function doPullWorkspaceCheckout(ctx: WorkspaceContext): Promise<Ch
 	const pending = createPullOperation(workspace, workspace.record.branch);
 	const git = simpleGit(workspace.path);
 	try {
-		ctx.log.log(pending);
+		ctx.operations.log(pending);
 		await git.pull('origin', workspace.record.branch);
 		const updated = await scanCheckoutState(ctx, workspace, true);
-		ctx.log.log(createOperationSuccess(pending));
+		ctx.operations.log(createOperationSuccess(pending));
 		return updated;
 	} catch (error) {
-		ctx.log.log(
-			createOperationFailure(createPullOperation(workspace, workspace.record.branch), error),
-		);
+		const failure = createOperationFailure(pending, error);
+		ctx.operations.log(failure);
 		return null;
 	}
 }

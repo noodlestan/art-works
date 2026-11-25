@@ -3,12 +3,12 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeConfigMock } from '../../../test/helpers/context/makeConfigMock.js';
+import { makeWorkspaceConfigFixture } from '../../../test/helpers/context/makeWorkspaceConfigFixture.js';
 import {
-	writeNamespaceMockRecord,
-	writePackageMockRecord,
-	writeProjectMockRecord,
-} from '../../../test/helpers/records/writeProjectMockRecord.js';
+	writeNamespaceRecordFixture,
+	writePackageRecordFixture,
+	writeProjectRecordFixture,
+} from '../../../test/helpers/records/writeProjectRecordFixtures.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
 import { loadNamespaceRecords } from '../namespace/loadNamespaceRecords.js';
@@ -34,12 +34,12 @@ afterEach(async () => {
 describe('loadProjectRecords', () => {
 	it('WHEN the project file is valid it parses the record', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeProjectMockRecord(tempDir, 'Artificial', {
+		writeProjectRecordFixture(tempDir, 'Artificial', {
 			remote: 'git@example.com:artificial.git',
 			path: 'artisans',
 			namespaces: ['Art Domains', 'Art Tools'],
 		});
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadProjectRecords(config, tempDir);
 
@@ -55,7 +55,7 @@ describe('loadProjectRecords', () => {
 		mkdirSync(join(tempDir, '_records'), { recursive: true });
 		const file = join(tempDir, '_records/bad.art');
 		writeFileSync(file, 'no project heading here');
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadProjectRecords(config, tempDir);
 
@@ -64,9 +64,9 @@ describe('loadProjectRecords', () => {
 
 	it('WHEN records exist in _records/ it discovers project records', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeProjectMockRecord(tempDir, 'Project A', { path: '.' });
-		writeProjectMockRecord(tempDir, 'Project B', { path: 'b' });
-		const config = makeConfigMock(tempDir);
+		writeProjectRecordFixture(tempDir, 'Project A', { path: '.' });
+		writeProjectRecordFixture(tempDir, 'Project B', { path: 'b' });
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadProjectRecords(config, tempDir);
 		expect(records).toHaveLength(2);
@@ -74,19 +74,19 @@ describe('loadProjectRecords', () => {
 	});
 
 	it('WHEN the checkout path is missing it returns an empty array', async () => {
-		const config = makeConfigMock('/nonexistent/checkout');
+		const config = makeWorkspaceConfigFixture('/nonexistent/checkout');
 		const records = await loadProjectRecords(config, '/nonexistent/checkout');
 		expect(records).toEqual([]);
 	});
 
 	it('WHEN the directory contains invalid records it filters them out', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeProjectMockRecord(tempDir, 'Good', { path: '.' });
+		writeProjectRecordFixture(tempDir, 'Good', { path: '.' });
 
 		const badFile = join(tempDir, '_records/bad.art');
 		writeFileSync(badFile, 'no heading');
 
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const records = await loadProjectRecords(config, tempDir);
 		expect(records).toHaveLength(1);
 		expect(records[0].name).toBe('Good');
@@ -96,11 +96,11 @@ describe('loadProjectRecords', () => {
 describe('loadNamespaceRecords', () => {
 	it('WHEN the namespace file is valid it parses the record', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeNamespaceMockRecord(tempDir, 'Art Domains', {
+		writeNamespaceRecordFixture(tempDir, 'Art Domains', {
 			path: 'artisans',
 			packages: ['Art Mantras', 'Art Tools'],
 		});
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadNamespaceRecords(config, tempDir);
 
@@ -116,7 +116,7 @@ describe('loadNamespaceRecords', () => {
 		mkdirSync(join(tempDir, '_records'), { recursive: true });
 		const file = join(tempDir, '_records/bad.art');
 		writeFileSync(file, 'no namespace heading here');
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadNamespaceRecords(config, tempDir);
 
@@ -125,9 +125,9 @@ describe('loadNamespaceRecords', () => {
 
 	it('WHEN records exist in _records/ it discovers namespace records', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeNamespaceMockRecord(tempDir, 'NS A', { path: 'a' });
-		writeNamespaceMockRecord(tempDir, 'NS B', { path: 'b' });
-		const config = makeConfigMock(tempDir);
+		writeNamespaceRecordFixture(tempDir, 'NS A', { path: 'a' });
+		writeNamespaceRecordFixture(tempDir, 'NS B', { path: 'b' });
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadNamespaceRecords(config, tempDir);
 		expect(records).toHaveLength(2);
@@ -135,19 +135,19 @@ describe('loadNamespaceRecords', () => {
 	});
 
 	it('WHEN the checkout path is missing it returns an empty array', async () => {
-		const config = makeConfigMock('/nonexistent/checkout');
+		const config = makeWorkspaceConfigFixture('/nonexistent/checkout');
 		const records = await loadNamespaceRecords(config, '/nonexistent/checkout');
 		expect(records).toEqual([]);
 	});
 
 	it('WHEN the directory contains invalid records it filters them out', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeNamespaceMockRecord(tempDir, 'Good', { path: '.' });
+		writeNamespaceRecordFixture(tempDir, 'Good', { path: '.' });
 
 		const badFile = join(tempDir, '_records/bad.art');
 		writeFileSync(badFile, 'no heading');
 
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const records = await loadNamespaceRecords(config, tempDir);
 		expect(records).toHaveLength(1);
 		expect(records[0].name).toBe('Good');
@@ -157,11 +157,11 @@ describe('loadNamespaceRecords', () => {
 describe('loadPackageRecords', () => {
 	it('WHEN the package file is valid it parses the record', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writePackageMockRecord(tempDir, 'Art Mantras', {
+		writePackageRecordFixture(tempDir, 'Art Mantras', {
 			canonicalName: '@artisans/art-mantras',
 			path: 'apps/art-mantras',
 		});
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadPackageRecords(config, tempDir);
 
@@ -177,7 +177,7 @@ describe('loadPackageRecords', () => {
 		mkdirSync(join(tempDir, '_records'), { recursive: true });
 		const file = join(tempDir, '_records/bad.art');
 		writeFileSync(file, 'no package heading here');
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadPackageRecords(config, tempDir);
 
@@ -191,7 +191,7 @@ describe('loadPackageRecords', () => {
 			join(tempDir, '_records/package.art'),
 			'# Module\n\n## Package Dependency: Commander\n\n**Canonical Name:** `commander`\n\n## Package: Tool Box\n\n**Canonical Name:** `@test/tool-box`\n\n**Path:** `tools/box`\n',
 		);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadPackageRecords(config, tempDir);
 
@@ -203,9 +203,9 @@ describe('loadPackageRecords', () => {
 
 	it('WHEN records exist in _records/ it discovers package records', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writePackageMockRecord(tempDir, 'Pkg A', { path: 'a' });
-		writePackageMockRecord(tempDir, 'Pkg B', { path: 'b' });
-		const config = makeConfigMock(tempDir);
+		writePackageRecordFixture(tempDir, 'Pkg A', { path: 'a' });
+		writePackageRecordFixture(tempDir, 'Pkg B', { path: 'b' });
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadPackageRecords(config, tempDir);
 		expect(records).toHaveLength(2);
@@ -213,19 +213,19 @@ describe('loadPackageRecords', () => {
 	});
 
 	it('WHEN the checkout path is missing it returns an empty array', async () => {
-		const config = makeConfigMock('/nonexistent/checkout');
+		const config = makeWorkspaceConfigFixture('/nonexistent/checkout');
 		const records = await loadPackageRecords(config, '/nonexistent/checkout');
 		expect(records).toEqual([]);
 	});
 
 	it('WHEN the directory contains invalid records it filters them out', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writePackageMockRecord(tempDir, 'Good', { path: '.' });
+		writePackageRecordFixture(tempDir, 'Good', { path: '.' });
 
 		const badFile = join(tempDir, '_records/bad.art');
 		writeFileSync(badFile, 'no heading');
 
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const records = await loadPackageRecords(config, tempDir);
 		expect(records).toHaveLength(1);
 		expect(records[0].name).toBe('Good');
@@ -308,19 +308,19 @@ describe('consolidateProjectGraph', () => {
 describe('loadProjectGraph', () => {
 	it('WHEN all record kinds exist it loads a complete project graph', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeProjectMockRecord(tempDir, 'Artificial', {
+		writeProjectRecordFixture(tempDir, 'Artificial', {
 			path: '.',
 			namespaces: ['Art Domains'],
 		});
-		writeNamespaceMockRecord(tempDir, 'Art Domains', {
+		writeNamespaceRecordFixture(tempDir, 'Art Domains', {
 			path: 'artisans',
 			packages: ['Art Mantras'],
 		});
-		writePackageMockRecord(tempDir, 'Art Mantras', {
+		writePackageRecordFixture(tempDir, 'Art Mantras', {
 			canonicalName: '@artisans/art-mantras',
 			path: 'apps/art-mantras',
 		});
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const graph = await loadProjectGraph(config, tempDir);
 
@@ -333,7 +333,7 @@ describe('loadProjectGraph', () => {
 
 	it('WHEN _records/ contains decoy .art files it ignores them', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeProjectMockRecord(tempDir, 'Real', { path: '.' });
+		writeProjectRecordFixture(tempDir, 'Real', { path: '.' });
 
 		writeFileSync(
 			join(tempDir, '_records/not-a-record.art'),
@@ -345,7 +345,7 @@ describe('loadProjectGraph', () => {
 		);
 		writeFileSync(join(tempDir, '_records/bad-project.art'), 'no heading');
 
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const graph = await loadProjectGraph(config, tempDir);
 
 		expect(graph.projects).toHaveLength(1);
@@ -354,7 +354,7 @@ describe('loadProjectGraph', () => {
 	});
 
 	it('WHEN the _records/ directory is missing it returns an empty graph', async () => {
-		const config = makeConfigMock('/nonexistent/checkout');
+		const config = makeWorkspaceConfigFixture('/nonexistent/checkout');
 		const graph = await loadProjectGraph(config, '/nonexistent/checkout');
 
 		expect(graph.projects).toEqual([]);
@@ -372,7 +372,7 @@ describe('loadProjectGraph', () => {
 			join(nestedDir, '_records/package.art'),
 			'# Module\n\n## Package: Parser\n\n**Canonical Name:** `@art/parser`\n\n**Path:** `.`\n',
 		);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		const records = await loadPackageRecords(config, tempDir);
 		expect(records).toHaveLength(1);

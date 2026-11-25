@@ -1,11 +1,10 @@
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
-import { createGenericOperation } from '@art-lib/operations';
+import { type OperationsLog, createGenericOperation } from '@art-lib/operations';
 
 import { loadWorkspaceConfig } from '../../config/loadWorkspaceConfig.js';
 import type { WorkspaceConfig } from '../../config/types.js';
-import type { LoggerAPI as Logger } from '../logger/createLogger.js';
 
 const MANIFEST_FILE = '.art-workspace.mts';
 
@@ -31,11 +30,11 @@ function discoverConfigRoot(startDir: string): string | null {
 }
 
 export async function createConfig(
-	logger: Logger,
+	operations: OperationsLog,
 	root: string,
 	options?: { cache?: boolean; verbose?: boolean },
 ): Promise<WorkspaceConfig> {
-	logger.log(createGenericOperation('locate-config'));
+	operations.log(createGenericOperation('locate-config'));
 	const configRoot = discoverConfigRoot(root);
 
 	if (configRoot === null) {
@@ -44,6 +43,6 @@ export async function createConfig(
 		console.info(`Running from config at ${join(configRoot, MANIFEST_FILE)}`);
 	}
 
-	logger.log(createGenericOperation('load-config'));
+	operations.log(createGenericOperation('load-config'));
 	return await loadWorkspaceConfig(configRoot ?? root, options);
 }

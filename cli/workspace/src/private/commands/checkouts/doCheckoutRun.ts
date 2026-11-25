@@ -2,9 +2,9 @@ import { createOperationFailure, createOperationSuccess } from '@art-lib/operati
 
 import type { WorkspaceContext } from '../../context/createWorkspaceContext.js';
 import { runCommandInDirectory } from '../../exec/runCommandInDirectory.js';
+import { createCheckoutRunOperation } from '../../operations/createCheckoutRunOperation.js';
 import { scanCheckoutState } from '../../scan/scanCheckoutState.js';
 import type { Checkout } from '../../store/createCheckout.js';
-import { createCheckoutRunOperation } from '../operations/createCheckoutRunOperation.js';
 
 export async function doCheckoutRun(
 	ctx: WorkspaceContext,
@@ -12,43 +12,49 @@ export async function doCheckoutRun(
 	command: string,
 ): Promise<Checkout | null> {
 	if (!checkout.scan?.state('exists').exists) {
-		const op = createOperationFailure(
-			createCheckoutRunOperation(checkout, command),
-			new Error('checkout not cloned'),
-		);
-		ctx.log.log(op);
+		const pending = createCheckoutRunOperation(checkout, command);
+		const failure = createOperationFailure(pending, new Error('checkout not cloned'));
+		ctx.operations.log(failure);
 		return null;
 	}
 
 	const pending = createCheckoutRunOperation(checkout, command);
+	ctx.operations.log(pending);
+
 	try {
-		ctx.log.log(pending);
 		const runOutcome = await runCommandInDirectory(checkout.path, command);
 		if (runOutcome.code === 0) {
-			ctx.log.log(createOperationSuccess(pending));
+			ctx.operations.log(createOperationSuccess(pending));
 		} else {
-			ctx.log.log(createOperationFailure(pending, new Error(`Exit code: ${runOutcome.code}`)));
+			const failure = createOperationFailure(pending, new Error(`Exit code: ${runOutcome.code}`));
+			ctx.operations.log(failure);
 		}
-		if (!runOutcome.output.trim() && !runOutcome.error.trim()) {
+
+		const hasOutput = Boolean(runOutcome.output.trim());
+		const hasError = Boolean(runOutcome.error.trim());
+
+		if (!hasOutput && !hasError) {
 			console.info('\n--- [No output]\n');
-		} else {
-			if (runOutcome.output) {
-				console.info('\n--- Output:\n');
-				console.info(runOutcome.output);
-				console.info('');
-			}
-			if (runOutcome.error) {
-				const maybeErrorLabel = runOutcome.code === 0 ? '' : ' Error:';
-				console.error(`\n---${maybeErrorLabel}\n`);
-				console.error(runOutcome.error);
-				console.error('');
-			}
 		}
+
+		if (hasOutput) {
+			console.info('\n--- Output:\n');
+			console.info(runOutcome.output);
+			console.info('');
+		}
+
+		if (hasError) {
+			const maybeErrorLabel = runOutcome.code === 0 ? '' : ' Error:';
+			console.error(`\n---${maybeErrorLabel}\n`);
+			console.error(runOutcome.error);
+			console.error('');
+		}
+
 		const updated = await scanCheckoutState(ctx, checkout, true);
 		ctx.store.updateCheckout(updated);
 		return updated;
 	} catch (error) {
-		ctx.log.log(createOperationFailure(pending, error));
+		ctx.operations.log(createOperationFailure(pending, error));
 		return null;
 	}
 }

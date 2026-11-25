@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCheckoutScanMock } from '../../test/helpers/checkout/makeCheckoutScanMock.js';
-import { makeWorkspaceCheckoutMock } from '../../test/helpers/checkout/makeWorkspaceCheckoutMock.js';
+import { makeCheckoutScanFixture } from '../../test/helpers/checkout/makeCheckoutScanFixture.js';
+import { makeWorkspaceCheckoutFixture } from '../../test/helpers/checkout/makeWorkspaceCheckoutFixture.js';
 
 import { presentWorkspaceReport } from './presentWorkspaceReport.js';
 
@@ -19,7 +19,7 @@ describe('presentWorkspaceReport', () => {
 	it('WHEN a workspace is presented it prints the header and field list', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
-		presentWorkspaceReport(makeWorkspaceCheckoutMock('/tmp'));
+		presentWorkspaceReport(makeWorkspaceCheckoutFixture('/tmp'));
 
 		expect(infoSpy).toHaveBeenCalledWith('Workspace:');
 		expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining('remote:'));
@@ -33,8 +33,8 @@ describe('presentWorkspaceReport', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
 		presentWorkspaceReport(
-			makeWorkspaceCheckoutMock('/tmp', {
-				scan: makeCheckoutScanMock(['ahead', 'uncommitted']),
+			makeWorkspaceCheckoutFixture('/tmp', {
+				scan: makeCheckoutScanFixture(['ahead', 'uncommitted']),
 			}),
 		);
 
@@ -47,8 +47,8 @@ describe('presentWorkspaceReport', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
 		presentWorkspaceReport(
-			makeWorkspaceCheckoutMock('/tmp', {
-				scan: makeCheckoutScanMock(['behind']),
+			makeWorkspaceCheckoutFixture('/tmp', {
+				scan: makeCheckoutScanFixture(['behind']),
 			}),
 		);
 
@@ -67,8 +67,8 @@ describe('presentWorkspaceReport', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
 		presentWorkspaceReport(
-			makeWorkspaceCheckoutMock('/tmp', {
-				scan: makeCheckoutScanMock(['no-remote']),
+			makeWorkspaceCheckoutFixture('/tmp', {
+				scan: makeCheckoutScanFixture(['no-remote']),
 			}),
 		);
 

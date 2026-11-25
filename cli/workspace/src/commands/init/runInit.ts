@@ -51,7 +51,7 @@ const INIT_MANIFEST_SOURCE = `export default {
  * Refuses to overwrite an existing manifest. Returns whether it was created.
  */
 export async function runInit(ctx: WorkspaceContext, options: { root: string }): Promise<boolean> {
-	ctx.log.log(createGenericOperation('command', ['init', options]));
+	ctx.operations.log(createGenericOperation('command', ['init', options]));
 
 	const manifestPath = join(options.root, MANIFEST_FILE);
 

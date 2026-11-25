@@ -1,8 +1,9 @@
 import type { FSRecordsAdapter } from '@art-lib/fs-records';
+import type { LoggerAPI } from '@art-lib/logger';
+import type { OperationsLog } from '@art-lib/operations';
 import type { ArtCodec } from '@art-md/primitives';
 
 import type { WorkspaceConfig } from '../../config/types.js';
-import type { OperationsLog } from '../log/createOperationsLog.js';
 import type { Checkout } from '../store/createCheckout.js';
 import type { CheckoutStore } from '../store/createCheckoutStore.js';
 
@@ -15,8 +16,9 @@ export function createWorkspaceContext(
 	store: CheckoutStore,
 	fsRecords: FSRecordsAdapter,
 	codec: ArtCodec,
-	log: OperationsLog,
+	operations: OperationsLog,
+	logger: LoggerAPI,
 	workspace?: Checkout,
 ): WorkspaceContext {
-	return { config, store, fsRecords, codec, log, workspace };
+	return { config, store, fsRecords, codec, operations, logger, workspace };
 }

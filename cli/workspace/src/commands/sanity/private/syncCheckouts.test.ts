@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -13,12 +13,12 @@ afterEach(async () => {
 });
 
 describe('syncCheckouts', () => {
-	it('WHEN the store has no checkouts it is a no-op', async () => {
+	it('WHEN the store has no checkouts, it does not log operations', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 
 		await syncCheckouts(ctx);
 
-		expect(ctx.log.all()).toHaveLength(0);
+		expect(ctx.operations.log).not.toHaveBeenCalled();
 	});
 });

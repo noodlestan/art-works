@@ -1,4 +1,4 @@
-import { doClone } from '../../../private/commands/doClone.js';
+import { doClone } from '../../../private/commands/checkouts/doClone.js';
 import type { WorkspaceContext } from '../../../private/context/createWorkspaceContext.js';
 import { scanCheckoutState } from '../../../private/scan/scanCheckoutState.js';
 import type { Checkout } from '../../../private/store/createCheckout.js';

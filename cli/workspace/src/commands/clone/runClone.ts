@@ -5,9 +5,9 @@ import { loadCheckoutRecords } from '../../private/resources/checkout/loadChecko
 import { loadRepositoryRecords } from '../../private/resources/repository/loadRepositoryRecords.js';
 import { hydrateStoreFromRecords } from '../../private/store/hydrateStoreFromRecords.js';
 
-import { cloneAll } from './cloneAll.js';
-import { cloneSpecific } from './cloneSpecific.js';
-import { cloneStatus } from './cloneStatus.js';
+import { cloneAll } from './private/cloneAll.js';
+import { cloneSpecific } from './private/cloneSpecific.js';
+import { cloneStatus } from './private/cloneStatus.js';
 
 interface CloneOptions {
 	all?: boolean;
@@ -23,7 +23,7 @@ export async function runClone(
 	const records = await loadCheckoutRecords(ctx, repos);
 	hydrateStoreFromRecords(ctx.config, ctx.store, records);
 
-	ctx.log.log(createGenericOperation('command', ['clone', options]));
+	ctx.operations.log(createGenericOperation('command', ['clone', options]));
 
 	const { all, repoName, checkoutInput } = options;
 

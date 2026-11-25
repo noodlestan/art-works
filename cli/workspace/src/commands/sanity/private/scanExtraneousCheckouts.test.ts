@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -18,7 +18,7 @@ afterEach(async () => {
 describe('scanExtraneousCheckouts', () => {
 	it('WHEN the checkouts dir is empty it returns no extraneous entries', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 		mkdirSync(join(tempDir, ctx.config.checkouts.path), { recursive: true });
 		const store = ctx.store;
 
@@ -29,7 +29,7 @@ describe('scanExtraneousCheckouts', () => {
 
 	it('WHEN a checkout is known it is not flagged as extraneous', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 		const checkoutsPath = join(tempDir, ctx.config.checkouts.path);
 		mkdirSync(checkoutsPath, { recursive: true });
 		const store = ctx.store;

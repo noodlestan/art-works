@@ -2,11 +2,11 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { simpleGit } from 'simple-git';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCheckoutMock } from '../../../test/helpers/checkout/makeCheckoutMock.js';
-import { makeCheckoutScanMock } from '../../../test/helpers/checkout/makeCheckoutScanMock.js';
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { makeCheckoutFixture } from '../../../test/helpers/checkout/makeCheckoutFixture.js';
+import { makeCheckoutScanFixture } from '../../../test/helpers/checkout/makeCheckoutScanFixture.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { advanceBareRepoByOneCommit } from '../../../test/helpers/git/advanceBareRepoByOneCommit.js';
 import { makeGitBareRepo } from '../../../test/helpers/git/makeGitBareRepo.js';
 import { makeGitRepoFromBare } from '../../../test/helpers/git/makeGitRepoFromBare.js';
@@ -23,94 +23,53 @@ afterEach(async () => {
 });
 
 describe('doPullCheckout', () => {
-	it('WHEN the checkout is behind it pulls and returns the updated state', async () => {
+	it('WHEN the checkout is behind, it pulls and logs pending and success', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
 		const repoDir = join(workspaceDir, ctx.config.checkouts.path, 'behind');
 		await makeGitRepoFromBare(tempDirs, bareDir, { dir: repoDir });
-
-		// Create an advance in another clone
 		await advanceBareRepoByOneCommit(tempDirs, bareDir);
-
 		const git = simpleGit(repoDir);
 		await git.fetch('origin', 'main');
-
-		const checkout = makeCheckoutMock({
+		const checkout = makeCheckoutFixture({
 			path: repoDir,
 			repo: { name: 'Behind', remote: 'git@example.com:behind.git' },
 		});
 		const scanned = await scanCheckoutState(ctx, checkout);
-		expect(scanned.scan?.state('sync').behind).toBe(1);
 
 		const result = await doPullCheckout(ctx, scanned);
 
+		expect(scanned.scan?.state('sync').behind).toBe(1);
 		expect(result).not.toBeNull();
 		expect(result?.scan?.state('sync').behind).toBe(0);
 		expect(existsSync(join(repoDir, 'origin.txt'))).toBe(true);
-		expect(ctx.log.all()).toHaveLength(1);
-		expect(ctx.log.all()[0].outcome).toBe('success');
+		const expectedPendingOp = expect.objectContaining({ operation: 'pull', outcome: 'pending' });
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedPendingOp);
+		const expectedSuccessOp = expect.objectContaining({ operation: 'pull', outcome: 'success' });
+		expect(ctx.operations.log).toHaveBeenCalledWith(expectedSuccessOp);
 	});
 
-	it('WHEN the pull fails it logs failure and returns null', async () => {
+	it('WHEN the pull fails, it returns null and logs pending and failure', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
 		const repoDir = join(workspaceDir, ctx.config.checkouts.path, 'nopull');
 		await makeGitRepoFromBare(tempDirs, bareDir, { dir: repoDir });
-
-		// Point remote to a non-existent path so pull fails
 		const git = simpleGit(repoDir);
 		await git.remote(['set-url', 'origin', join(workspaceDir, 'missing-origin')]);
-
-		const checkout = makeCheckoutMock({
+		const checkout = makeCheckoutFixture({
 			path: repoDir,
 			repo: { name: 'NoPull', remote: 'git@example.com:nopull.git' },
+			scan: makeCheckoutScanFixture(['behind']),
 		});
-		checkout.scan = makeCheckoutScanMock(['behind']);
 
 		const result = await doPullCheckout(ctx, checkout);
 
 		expect(result).toBeNull();
-		expect(ctx.log.all()).toHaveLength(1);
-		expect(ctx.log.all()[0].outcome).toBe('failure');
-	});
-
-	it('WHEN the pull runs it emits a pending operation before the side effect', async () => {
-		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
-		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
-		const repoDir = join(workspaceDir, ctx.config.checkouts.path, 'pending-pull');
-		await makeGitRepoFromBare(tempDirs, bareDir, { dir: repoDir });
-
-		// Point remote to a non-existent path so pull fails
-		const git = simpleGit(repoDir);
-		await git.remote(['set-url', 'origin', join(workspaceDir, 'missing-origin')]);
-
-		const checkout = makeCheckoutMock({
-			path: repoDir,
-			repo: { name: 'PendingPull', remote: 'git@example.com:pending-pull.git' },
-		});
-		checkout.scan = makeCheckoutScanMock(['behind']);
-
-		let pendingEmitted = false;
-		const spy = vi.fn(() => {
-			pendingEmitted = true;
-		});
-
-		const originalLog = ctx.log;
-		const pendingLog = {
-			...originalLog,
-			log(op: unknown) {
-				if ((op as { outcome?: string }).outcome === 'pending') spy();
-				originalLog.log(op as never);
-			},
-		};
-		(ctx as unknown as { log: typeof pendingLog }).log = pendingLog;
-
-		const result = await doPullCheckout(ctx, checkout);
-
-		expect(result).toBeNull();
-		expect(pendingEmitted).toBe(true);
+		const expectedPendingOp = expect.objectContaining({ operation: 'pull', outcome: 'pending' });
+		expect(ctx.operations.log).toHaveBeenNthCalledWith(1, expectedPendingOp);
+		const expectedFailureOp = expect.objectContaining({ operation: 'pull', outcome: 'failure' });
+		expect(ctx.operations.log).toHaveBeenNthCalledWith(2, expectedFailureOp);
 	});
 });

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Checkout } from '../../private/store/createCheckout.js';
-import { makeCheckoutScanMock } from '../../test/helpers/checkout/makeCheckoutScanMock.js';
+import { makeCheckoutScanFixture } from '../../test/helpers/checkout/makeCheckoutScanFixture.js';
 
 import { presentPackageStateReport } from './presentPackageStateReport.js';
 
@@ -19,7 +19,7 @@ describe('presentPackageStateReport', () => {
 		checkout = {
 			record: { name: 'Artificial', location: 'artificial', branch: 'main' },
 			path: '/tmp/artificial',
-			scan: makeCheckoutScanMock([]),
+			scan: makeCheckoutScanFixture([]),
 		};
 	});
 

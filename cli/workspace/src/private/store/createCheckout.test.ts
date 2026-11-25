@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
+import { makeWorkspaceConfigFixture } from '../../test/helpers/context/makeWorkspaceConfigFixture.js';
 
 import { createCheckout } from './createCheckout.js';
 
 describe('createCheckout', () => {
 	it('GIVEN no overrides it applies the factory defaults', () => {
-		const config = makeConfigMock('.');
+		const config = makeWorkspaceConfigFixture('.');
 		const checkout = createCheckout(config, 'target');
 
 		expect(checkout.path).toBe('checkouts/target');
@@ -18,7 +18,7 @@ describe('createCheckout', () => {
 	});
 
 	it('WHEN a repo is provided it creates a checkout based on the repo', () => {
-		const config = makeConfigMock('.');
+		const config = makeWorkspaceConfigFixture('.');
 		const repo = { name: 'Foo Bar', remote: 'git@example.com:foo-bar.git' };
 		const checkout = createCheckout(config, 'fix-test', repo);
 
@@ -31,7 +31,7 @@ describe('createCheckout', () => {
 	});
 
 	it('WHEN a branch is provided it creates a checkout with that branch', () => {
-		const config = makeConfigMock('.');
+		const config = makeWorkspaceConfigFixture('.');
 		const repo = { name: 'Foo Bar', remote: 'git@example.com:foo-bar.git' };
 		const checkout = createCheckout(config, 'fix-test', repo, 'branch-name');
 
@@ -42,7 +42,7 @@ describe('createCheckout', () => {
 	});
 
 	it('WHEN repo, target and custom name are provided it creates the checkout', () => {
-		const config = makeConfigMock('.');
+		const config = makeWorkspaceConfigFixture('.');
 		const repo = { name: 'Foo Bar', remote: 'git@example.com:foo-bar.git' };
 		const checkout = createCheckout(config, 'fix-test', repo, undefined, 'Checkout Name');
 

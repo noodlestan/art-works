@@ -31,7 +31,7 @@ export async function runRepo(
 		records as unknown as Parameters<typeof hydrateStoreFromRecords>[2],
 	);
 
-	ctx.log.log(createGenericOperation('command', ['repo', options]));
+	ctx.operations.log(createGenericOperation('command', ['repo', options]));
 
 	await scanAllCheckoutsStates(ctx);
 

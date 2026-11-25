@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
+import { makeWorkspaceConfigFixture } from '../../test/helpers/context/makeWorkspaceConfigFixture.js';
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -23,7 +23,7 @@ describe('presentCheckoutReport', () => {
 	it('WHEN the report runs it calls console.info with Checkouts:', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 		const tempDir = makeTempDir(tempDirs);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 
 		presentCheckoutReport(config, []);
 

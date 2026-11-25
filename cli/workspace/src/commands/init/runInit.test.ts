@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCommandContextMock } from '../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -22,7 +22,7 @@ describe('init command', () => {
 	it('WHEN the workspace has no manifest, creates it with the default config values', async () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 		const root = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(root);
+		const ctx = createWorkspaceContextMock(root);
 
 		const created = await runInit(ctx, { root });
 
@@ -44,7 +44,7 @@ describe('init command', () => {
 		const root = makeTempDir(tempDirs);
 		const manifestPath = join(root, MANIFEST_FILE);
 		writeFileSync(manifestPath, 'export default { existing: true };');
-		const ctx = makeCommandContextMock(root);
+		const ctx = createWorkspaceContextMock(root);
 
 		const created = await runInit(ctx, { root });
 

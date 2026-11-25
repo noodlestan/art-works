@@ -1,4 +1,4 @@
-import { readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -8,6 +8,7 @@ import { makeTempDir } from '../src/test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../src/test/helpers/tempDirs/removeTempDirs.js';
 
 import { ENCODING, PACKAGE_ROOT } from './helpers/constants.js';
+import { setupCloneWorkspace } from './helpers/setupCloneWorkspace.js';
 import { setupWorkspace } from './helpers/setupWorkspace.js';
 import { spawnCli } from './helpers/spawnCli.js';
 import { type TestCliResult } from './helpers/types.js';
@@ -182,13 +183,17 @@ describe('cli integration', () => {
 				expect(result.stdout).toContain('Checkouts:');
 			});
 
-			it('WHEN given --all, accepts the option and runs', async () => {
-				const root = await setupWorkspace(tempDirs);
+			it('WHEN given --all, clones every configured checkout', async () => {
+				const { root, locations } = await setupCloneWorkspace(tempDirs);
 
 				const result = await spawnCli({ args: ['clone', '--all'], cwd: root });
 
 				expect(result.code).toBe(0);
 				expect(result.stdout).toContain('Checkouts:');
+				for (const location of locations) {
+					expect(existsSync(join(root, 'checkouts', location, '.git')), output(result)).toBe(true);
+					expect(existsSync(join(root, 'checkouts', location, 'README.md'))).toBe(true);
+				}
 			});
 		});
 

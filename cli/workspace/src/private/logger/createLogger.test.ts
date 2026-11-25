@@ -1,49 +1,35 @@
-import { createGenericOperation } from '@art-lib/operations';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createLogger, parseOutputMode } from './createLogger.js';
+import { createLogger } from './createLogger.js';
 
-afterEach(() => {
-	vi.restoreAllMocks();
+const stdoutWriteMock = vi.fn<(chunk: string) => void>();
+const stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(chunk => {
+	stdoutWriteMock(String(chunk));
+	return true;
 });
 
-describe('parseOutputMode', () => {
-	it('WHEN the argv value is quiet it returns quiet', () => {
-		expect(parseOutputMode('quiet')).toBe('quiet');
-	});
-
-	it('WHEN the argv value is verbose it returns verbose', () => {
-		expect(parseOutputMode('verbose')).toBe('verbose');
-	});
-
-	it('WHEN the argv value is absent it defaults to normal', () => {
-		expect(parseOutputMode()).toBe('normal');
-	});
-
-	it('WHEN the argv value is unknown it falls back to normal', () => {
-		expect(parseOutputMode('loud')).toBe('normal');
-	});
+beforeEach(() => {
+	stdoutWriteMock.mockClear();
 });
+
+afterAll(() => stdoutWriteSpy.mockRestore());
 
 describe('createLogger', () => {
-	it('WHEN the mode is normal it prints pending operations', () => {
-		const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+	it('WHEN the mode is normal it writes logger message text to stdout', () => {
 		const logger = createLogger();
 
-		logger.log(createGenericOperation('boot'));
+		logger.log({ level: 'info', text: 'boot', ts: Date.now() });
 		logger.setOutputMode('normal');
 
-		expect(info).toHaveBeenCalledTimes(1);
-		expect(info.mock.calls[0]?.[0]).toContain('boot');
+		expect(stdoutWriteMock).toHaveBeenCalledWith('boot\n');
 	});
 
-	it('WHEN the mode is quiet it drops pending operations', () => {
-		const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+	it('WHEN the mode is quiet it filters debug messages', () => {
 		const logger = createLogger();
 
-		logger.log(createGenericOperation('boot'));
+		logger.log({ level: 'debug', text: 'boot', ts: Date.now() });
 		logger.setOutputMode('quiet');
 
-		expect(info).not.toHaveBeenCalled();
+		expect(stdoutWriteMock).not.toHaveBeenCalled();
 	});
 });

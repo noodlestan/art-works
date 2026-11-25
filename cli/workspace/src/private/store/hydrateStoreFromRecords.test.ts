@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeConfigMock } from '../../test/helpers/context/makeConfigMock.js';
+import { makeWorkspaceConfigFixture } from '../../test/helpers/context/makeWorkspaceConfigFixture.js';
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -16,7 +16,7 @@ afterEach(async () => {
 describe('hydrateStoreFromRecords', () => {
 	it('WHEN records are hydrated the store gets a checkout per record', () => {
 		const tempDir = makeTempDir(tempDirs);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const store = createCheckoutStore();
 		const records = [
 			{
@@ -41,7 +41,7 @@ describe('hydrateStoreFromRecords', () => {
 
 	it('WHEN a record is hydrated the record handle is copied into the checkout', () => {
 		const tempDir = makeTempDir(tempDirs);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const store = createCheckoutStore();
 		const recordHandle = {
 			name: 'Checkout: Foo',
@@ -63,7 +63,7 @@ describe('hydrateStoreFromRecords', () => {
 
 	it('WHEN hydrate creates a new checkout it carries the record handle', () => {
 		const tempDir = makeTempDir(tempDirs);
-		const config = makeConfigMock(tempDir);
+		const config = makeWorkspaceConfigFixture(tempDir);
 		const store = createCheckoutStore();
 		const recordHandle = {
 			name: 'Checkout: Orphan',

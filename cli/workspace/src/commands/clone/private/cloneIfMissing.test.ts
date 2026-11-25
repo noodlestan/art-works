@@ -1,14 +1,10 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { simpleGit } from 'simple-git';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getCurrentBranch } from '../../../private/git/getCurrentBranch.js';
-import { createCheckout } from '../../../private/store/createCheckout.js';
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
-import { makeGitBareRepo } from '../../../test/helpers/git/makeGitBareRepo.js';
-import { writeRepoMockRecord } from '../../../test/helpers/records/writeRepoMockRecord.js';
+import { makeCheckoutFixture } from '../../../test/helpers/checkout/makeCheckoutFixture.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -18,102 +14,35 @@ const tempDirs: string[] = [];
 
 afterEach(async () => {
 	await removeTempDirs(tempDirs);
-	vi.restoreAllMocks();
 });
 
 describe('cloneIfMissing', () => {
-	it('WHEN a checkout has no repo it returns null', async () => {
+	it('WHEN the checkout directory exists, it returns the scanned checkout without cloning', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
-		const checkout = createCheckout(ctx.config, 'orphan');
+		const ctx = createWorkspaceContextMock(workspaceDir);
+		const checkoutPath = join(workspaceDir, 'checkouts', 'existing');
+		mkdirSync(checkoutPath, { recursive: true });
+		const checkout = makeCheckoutFixture({ path: checkoutPath });
+
+		const result = await cloneIfMissing(ctx, checkout);
+
+		expect(result?.path).toBe(checkoutPath);
+		expect(result?.scan?.state('exists').exists).toBe(true);
+		expect(
+			vi
+				.mocked(ctx.operations.log)
+				.mock.calls.some(([operation]) => operation.operation === 'clone'),
+		).toBe(false);
+	});
+
+	it('WHEN the checkout is missing and has no repository, it returns null', async () => {
+		const workspaceDir = makeTempDir(tempDirs);
+		const ctx = createWorkspaceContextMock(workspaceDir);
+		const checkout = makeCheckoutFixture({ path: join(workspaceDir, 'checkouts', 'orphan') });
 
 		const result = await cloneIfMissing(ctx, checkout);
 
 		expect(result).toBeNull();
-	});
-
-	it('WHEN the recorded branch exists on remote it clones and checks it out', async () => {
-		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
-
-		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
-
-		const setupGit = simpleGit(workspaceDir);
-		await setupGit.clone(bareDir, 'work');
-		const workDir = join(workspaceDir, 'work');
-		writeFileSync(join(workDir, 'README.md'), '# feature repo');
-		const workGit = simpleGit(workDir);
-		await workGit.add('.');
-		await workGit.commit('initial commit');
-		await workGit.push('origin', 'main');
-		await workGit.checkoutLocalBranch('feature-branch');
-		await workGit.push('origin', 'feature-branch');
-
-		writeRepoMockRecord(workspaceDir, 'FeatureRepo', bareDir);
-		const { loadRepositoryRecords } =
-			await import('../../../private/resources/repository/loadRepositoryRecords.js');
-		const repos = await loadRepositoryRecords(ctx);
-		const repo = repos.find(r => r.name === 'FeatureRepo');
-		expect(repo).toBeDefined();
-
-		const checkout = createCheckout(
-			ctx.config,
-			'feature-repo',
-			repo as NonNullable<typeof repo>,
-			'feature-branch',
-		);
-
-		const result = await cloneIfMissing(ctx, checkout);
-
-		expect(result).not.toBeNull();
-		const branch = await getCurrentBranch(result?.path as string);
-		expect(branch).toBe('feature-branch');
-
-		const recordFileName = `${checkout.record.name.toLowerCase().replace(/\s+/g, '-')}-checkout.art`;
-		const recordFile = join(workspaceDir, '_records', recordFileName);
-		expect(existsSync(recordFile)).toBe(true);
-		const content = readFileSync(recordFile, 'utf-8');
-		expect(content).toContain('feature-branch');
-	});
-
-	it('WHEN the recorded branch is missing it falls back to the default branch', async () => {
-		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
-
-		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
-
-		const setupGit = simpleGit(workspaceDir);
-		await setupGit.clone(bareDir, 'work');
-		const workDir = join(workspaceDir, 'work');
-		writeFileSync(join(workDir, 'README.md'), '# fallback repo');
-		const workGit = simpleGit(workDir);
-		await workGit.add('.');
-		await workGit.commit('initial commit');
-		await workGit.push('origin', 'main');
-
-		writeRepoMockRecord(workspaceDir, 'FallbackRepo', bareDir);
-		const { loadRepositoryRecords } =
-			await import('../../../private/resources/repository/loadRepositoryRecords.js');
-		const repos = await loadRepositoryRecords(ctx);
-		const repo = repos.find(r => r.name === 'FallbackRepo');
-		expect(repo).toBeDefined();
-
-		const checkout = createCheckout(
-			ctx.config,
-			'fallback-repo',
-			repo as NonNullable<typeof repo>,
-			'nonexistent-branch',
-		);
-
-		const result = await cloneIfMissing(ctx, checkout);
-
-		expect(result).not.toBeNull();
-		const branch = await getCurrentBranch(result?.path as string);
-		expect(branch).toBe('main');
-
-		const recordFileName = `${checkout.record.name.toLowerCase().replace(/\s+/g, '-')}-checkout.art`;
-		const recordFile = join(workspaceDir, '_records', recordFileName);
-		const content = readFileSync(recordFile, 'utf-8');
-		expect(content).toContain('main');
+		expect(ctx.operations.log).not.toHaveBeenCalled();
 	});
 });

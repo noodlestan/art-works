@@ -3,8 +3,8 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
-import { writeRepoMockRecord } from '../../../test/helpers/records/writeRepoMockRecord.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
+import { writeRepoRecordFixture } from '../../../test/helpers/records/writeRepoRecordFixture.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
 
@@ -26,8 +26,8 @@ afterEach(async () => {
 describe('loadRepositoryRecords', () => {
 	it('WHEN a record file is read it parses name, remote, purpose, description and consumers', async () => {
 		const tempDir = makeTempDir(tempDirs);
-		writeRepoMockRecord(tempDir, 'Artificial', `git@github.com:noodlestan/artificial.git`);
-		const ctx = makeCommandContextMock(tempDir);
+		writeRepoRecordFixture(tempDir, 'Artificial', `git@github.com:noodlestan/artificial.git`);
+		const ctx = createWorkspaceContextMock(tempDir);
 
 		const records = await loadRepositoryRecords(ctx);
 
@@ -40,7 +40,7 @@ describe('loadRepositoryRecords', () => {
 	});
 
 	it('WHEN the record file is missing it returns an empty array', async () => {
-		const ctx = makeCommandContextMock('/nonexistent/checkout');
+		const ctx = createWorkspaceContextMock('/nonexistent/checkout');
 
 		const records = await loadRepositoryRecords(ctx);
 
@@ -54,7 +54,7 @@ describe('loadRepositoryRecords', () => {
 			join(tempDir, '_records/noheading.art'),
 			'# Module\n\n**Purpose:** test\n\n**Remote:** `git@example.com:test.git`\n',
 		);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 
 		const records = await loadRepositoryRecords(ctx);
 
@@ -68,7 +68,7 @@ describe('loadRepositoryRecords', () => {
 			join(tempDir, '_records/norepo.art'),
 			'# Module\n\n## Repository: NoRemote\n\n**Purpose:** test\n',
 		);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 		const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
 		const records = await loadRepositoryRecords(ctx);

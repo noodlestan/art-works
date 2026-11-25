@@ -12,7 +12,7 @@ function readValue(value: unknown): string {
 
 export async function loadRepositoryRecords(ctx: WorkspaceContext): Promise<RepositoryRecord[]> {
 	const searchPath = ctx.config.root.path;
-	ctx.log.log(createGenericOperation('load-repository-records', searchPath));
+	ctx.operations.log(createGenericOperation('load-repository-records', searchPath));
 
 	const recordFiles: FSRecordFile[] = await ctx.fsRecords.discoverRecordFiles();
 	const documentRecords = createRecordsDocument<FSRecordFile>({

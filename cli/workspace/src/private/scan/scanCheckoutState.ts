@@ -39,7 +39,7 @@ export async function scanCheckoutState(
 		return { ...checkout, scan: createCheckoutNoClonedScan(Boolean(checkout.repo)) };
 	}
 	const pending = createScanCheckoutStateOperation(checkout);
-	ctx.log.log(pending);
+	ctx.operations.log(pending);
 
 	let hasGitDir = false;
 	try {
@@ -82,7 +82,7 @@ export async function scanCheckoutState(
 				}
 			}
 		} catch (error) {
-			ctx.log.log(createOperationFailure(pending, error));
+			ctx.operations.log(createOperationFailure(pending, error));
 		}
 	}
 

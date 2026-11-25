@@ -1,4 +1,4 @@
-import type { OperationsLog } from '../log/createOperationsLog.js';
+import type { OperationsLog } from '@art-lib/operations';
 
 import { formatTable } from './formatTable.js';
 import { makeOperationLogLine } from './makeOperationLogLine.js';

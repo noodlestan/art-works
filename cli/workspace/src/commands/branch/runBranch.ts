@@ -1,8 +1,8 @@
 import { createGenericOperation, createOperationFailure } from '@art-lib/operations';
 
 import { doBranchCheckout } from '../../private/commands/checkouts/doBranchCheckout.js';
-import { createBranchOperation } from '../../private/commands/operations/createBranchOperation.js';
 import type { WorkspaceContext } from '../../private/context/createWorkspaceContext.js';
+import { createBranchOperation } from '../../private/operations/createBranchOperation.js';
 import { presentCheckoutReport } from '../../private/present/presentCheckoutReport.js';
 import { presentOperationsReport } from '../../private/present/presentOperationsReport.js';
 import { loadCheckoutRecords } from '../../private/resources/checkout/loadCheckoutRecords.js';
@@ -24,10 +24,10 @@ export async function runBranch(
 	);
 
 	const pending = createGenericOperation('command', ['branch', options]);
-	ctx.log.log(pending);
+	ctx.operations.log(pending);
 
 	if (!options.all && (!options.checkouts || options.checkouts.length === 0)) {
-		ctx.log.log(createOperationFailure(pending, 'No targets.'));
+		ctx.operations.log(createOperationFailure(pending, 'No targets.'));
 		console.error(
 			`\nUsage: Use \`branch <branch> -c <pattern>\` to match specific checkouts or \`branch <branch> --all\` if you want to apply the command to all checkouts.\n`,
 		);
@@ -44,9 +44,9 @@ export async function runBranch(
 		ctx.store.updateCheckout(scanned);
 
 		if (!scanned.scan?.can?.('branch')) {
-			ctx.log.log(
-				createOperationFailure(createBranchOperation(scanned, branch), 'checkout not cloned'),
-			);
+			const branchOperation = createBranchOperation(scanned, branch);
+			const failure = createOperationFailure(branchOperation, 'checkout not cloned');
+			ctx.operations.log(failure);
 			continue;
 		}
 
@@ -55,5 +55,5 @@ export async function runBranch(
 
 	await scanAllCheckoutsStates(ctx);
 	presentCheckoutReport(ctx.config, ctx.store.getAllCheckouts());
-	presentOperationsReport(ctx.log);
+	presentOperationsReport(ctx.operations);
 }

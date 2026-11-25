@@ -3,20 +3,18 @@ import {
 	createOperationFailure,
 	createOperationSuccess,
 } from '@art-lib/operations';
+import { createOperationsLogMock } from '@art-lib/operations/test/helpers/log/createOperationsLogMock';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCommandContextMock } from '../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
-import { createCloneOperation } from '../commands/operations/createCloneOperation.js';
-import { createOperationsLog } from '../log/createOperationsLog.js';
-import type { ClonePending } from '../operations/types.js';
 import { createCheckout } from '../store/createCheckout.js';
 
 import { makeOperationLogLine } from './makeOperationLogLine.js';
 import { presentOperationsReport } from './presentOperationsReport.js';
 
-function makeClonePendingOperationMock(): ClonePending {
+function makeClonePendingOperationMock() {
 	return createGenericOperation('clone', { location: 'checkouts/my-repo' }, () => {
 		return 'cloning my-repo';
 	});
@@ -38,7 +36,8 @@ beforeEach(() => {
 describe('presentOperationsReport', () => {
 	it('WHEN the log is empty it prints no output', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-		const log = createOperationsLog();
+		const log = createOperationsLogMock();
+		vi.mocked(log.all).mockReturnValue([]);
 
 		presentOperationsReport(log);
 
@@ -47,14 +46,15 @@ describe('presentOperationsReport', () => {
 
 	it('WHEN operations exist it prints Operations:', () => {
 		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-		const log = createOperationsLog();
+		const log = createOperationsLogMock();
 		const tempDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 		const checkout = createCheckout(ctx.config, 'my-repo', {
 			name: 'MyRepo',
 			remote: 'git@example.com:my-repo.git',
 		});
-		log.log(createOperationSuccess(createCloneOperation(checkout)));
+		const cloneOperation = createGenericOperation('clone', { checkout }, () => 'to my-repo');
+		vi.mocked(log.all).mockReturnValue([createOperationSuccess(cloneOperation)]);
 
 		presentOperationsReport(log);
 
@@ -72,22 +72,23 @@ describe('makeOperationLogLine', () => {
 
 	it('FOR a successful operation it renders a line with 🟢', () => {
 		const tempDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(tempDir);
+		const ctx = createWorkspaceContextMock(tempDir);
 		const checkout = createCheckout(ctx.config, 'my-repo', {
 			name: 'MyRepo',
 			remote: 'git@example.com:my-repo.git',
 		});
 
-		const line = makeOperationLogLine(createOperationSuccess(createCloneOperation(checkout)));
+		const cloneOperation = createGenericOperation('clone', { checkout }, () => 'to my-repo');
+		const line = makeOperationLogLine(createOperationSuccess(cloneOperation));
 
 		expect(line[0]).toBe('🟢');
 		expect(line).toEqual(['🟢', 'MyRepo', 'my-repo', 'clone', 'to my-repo', '0']);
 	});
 
 	it('FOR a failed operation it renders a line with 🔴', () => {
-		const line = makeOperationLogLine(
-			createOperationFailure(createCloneOperation(undefined), new Error('boom')),
-		);
+		const pending = createGenericOperation('clone', undefined, () => 'cloning');
+		const failure = createOperationFailure(pending, new Error('boom'));
+		const line = makeOperationLogLine(failure);
 
 		expect(line[0]).toBe('🔴');
 		expect(line.slice(0, 5)).toEqual(['🔴', '-', '-', 'clone', 'boom']);

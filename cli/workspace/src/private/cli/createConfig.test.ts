@@ -1,18 +1,18 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { createOperationsLogMock } from '@art-lib/operations/test/helpers/log/createOperationsLogMock';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
-import type { LoggerAPI as Logger } from '../logger/createLogger.js';
 
 import { createConfig } from './createConfig.js';
 
 const MANIFEST_FILE = '.art-workspace.mts';
 
 const tempDirs: string[] = [];
-const logger: Logger = { log: vi.fn(), setOutputMode: vi.fn() };
+const operations = createOperationsLogMock();
 
 function writeManifest(dir: string, checkoutsPath: string): void {
 	const config = JSON.stringify({ checkouts: { path: checkoutsPath } });
@@ -35,7 +35,7 @@ describe('createConfig', () => {
 		const root = makeTempDir(tempDirs);
 		writeManifest(root, 'manifest-checkouts');
 
-		const config = await createConfig(logger, root);
+		const config = await createConfig(operations, root);
 
 		expect(config.root.path).toBe(root);
 		expect(config.checkouts.path).toBe('manifest-checkouts');
@@ -50,7 +50,7 @@ describe('createConfig', () => {
 		mkdirSync(child, { recursive: true });
 		writeManifest(parent, 'manifest-checkouts');
 
-		const config = await createConfig(logger, child);
+		const config = await createConfig(operations, child);
 
 		expect(config.root.path).toBe(parent);
 		expect(config.checkouts.path).toBe('manifest-checkouts');
@@ -63,7 +63,7 @@ describe('createConfig', () => {
 	it('WHEN no manifest exists in the cwd or any parent it falls back to the defaults', async () => {
 		const root = makeTempDir(tempDirs);
 
-		const config = await createConfig(logger, root);
+		const config = await createConfig(operations, root);
 
 		expect(config.root.path).toBe(root);
 		expect(config.checkouts.path).toBe('checkouts');

@@ -11,7 +11,7 @@ export async function loadCheckoutRecords(
 	repos: RepositoryRecord[],
 ): Promise<RepositoryCheckoutRecordHandle[]> {
 	const searchPath = ctx.config.root.path;
-	ctx.log.log(createGenericOperation('load-checkout-records', searchPath));
+	ctx.operations.log(createGenericOperation('load-checkout-records', searchPath));
 
 	const recordFiles: FSRecordFile[] = await ctx.fsRecords.discoverRecordFiles();
 	const documentRecords = createRecordsDocument<FSRecordFile>({

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCommandContextMock } from '../../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../../test/helpers/context/createWorkspaceContextMock.js';
 import { makeGitRepo } from '../../../test/helpers/git/makeGitRepo.js';
 import { makeTempDir } from '../../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../../test/helpers/tempDirs/removeTempDirs.js';
@@ -17,7 +17,7 @@ describe('scanWorkspaceCheckout', () => {
 	it('WHEN the workspace root exists it scans it and sets ctx.workspace', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
 		await makeGitRepo(tempDirs, { dir: workspaceDir });
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const result = await scanWorkspaceCheckout(ctx);
 
@@ -32,7 +32,7 @@ describe('scanWorkspaceCheckout', () => {
 	it('WHEN a refetch is requested it re-scans with refetch', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
 		await makeGitRepo(tempDirs, { dir: workspaceDir });
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const result = await scanWorkspaceCheckout(ctx, true);
 
@@ -43,7 +43,7 @@ describe('scanWorkspaceCheckout', () => {
 
 	it('WHEN the workspace root has no git it returns a not-cloned scan', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const result = await scanWorkspaceCheckout(ctx);
 

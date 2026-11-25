@@ -27,14 +27,14 @@ export async function runSync(
 	);
 
 	const pending = createGenericOperation('command', ['sync', options]);
-	ctx.log.log(pending);
+	ctx.operations.log(pending);
 
 	if (
 		!options.all &&
 		!options.workspace &&
 		(!options.checkouts || options.checkouts.length === 0)
 	) {
-		ctx.log.log(createOperationFailure(pending, 'No targets.'));
+		ctx.operations.log(createOperationFailure(pending, 'No targets.'));
 		console.error(
 			`\nUsage: Use \`sync -c <pattern>\` to match specific checkouts or \`sync --all\` if you want to apply the command to all checkouts. Add \`-w\` to apply the command to the workspace as well.\n`,
 		);
@@ -63,5 +63,5 @@ export async function runSync(
 	}
 
 	presentCheckoutReport(ctx.config, checkouts);
-	presentOperationsReport(ctx.log);
+	presentOperationsReport(ctx.operations);
 }

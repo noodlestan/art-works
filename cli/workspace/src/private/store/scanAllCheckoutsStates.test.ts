@@ -2,13 +2,13 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { makeCommandContextMock } from '../../test/helpers/context/makeCommandContextMock.js';
+import { createWorkspaceContextMock } from '../../test/helpers/context/createWorkspaceContextMock.js';
 import { advanceBareRepoByOneCommit } from '../../test/helpers/git/advanceBareRepoByOneCommit.js';
 import { advanceGitRepoByOneCommit } from '../../test/helpers/git/advanceGitRepoByOneCommit.js';
 import { makeGitBareRepo } from '../../test/helpers/git/makeGitBareRepo.js';
 import { makeGitRepoFromBare } from '../../test/helpers/git/makeGitRepoFromBare.js';
-import { writeCheckoutMockRecord } from '../../test/helpers/records/writeCheckoutMockRecord.js';
-import { writeRepoMockRecord } from '../../test/helpers/records/writeRepoMockRecord.js';
+import { writeCheckoutRecordFixture } from '../../test/helpers/records/writeCheckoutRecordFixture.js';
+import { writeRepoRecordFixture } from '../../test/helpers/records/writeRepoRecordFixture.js';
 import { makeTempDir } from '../../test/helpers/tempDirs/makeTempDir.js';
 import { removeTempDirs } from '../../test/helpers/tempDirs/removeTempDirs.js';
 import { loadCheckoutRecords } from '../resources/checkout/loadCheckoutRecords.js';
@@ -27,7 +27,7 @@ afterEach(async () => {
 describe('scanAllCheckoutsStates', () => {
 	it('WHEN the store is empty it is a no-op', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		await scanAllCheckoutsStates(ctx);
 
@@ -36,7 +36,7 @@ describe('scanAllCheckoutsStates', () => {
 
 	it('WHEN the store has checkouts it scans all and updates each', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const checkoutA = createCheckout(ctx.config, 'a', undefined, 'main', 'A');
 		const checkoutB = createCheckout(ctx.config, 'b', undefined, 'main', 'B');
@@ -58,7 +58,7 @@ describe('scanAllCheckoutsStates', () => {
 
 	it('WHEN scanning, the checkout order from getAllCheckouts is preserved', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const locations = ['alpha', 'bravo', 'charlie', 'delta'];
 		for (const loc of locations) {
@@ -74,7 +74,7 @@ describe('scanAllCheckoutsStates', () => {
 	it('WHEN refetch is true it detects behind state after remote advances', async () => {
 		const workspaceDir = makeTempDir(tempDirs);
 		const { dir: bareDir } = await makeGitBareRepo(tempDirs);
-		const ctx = makeCommandContextMock(workspaceDir);
+		const ctx = createWorkspaceContextMock(workspaceDir);
 
 		const repoDir = join(workspaceDir, ctx.config.checkouts.path, 'refetchtest');
 		const { git } = await makeGitRepoFromBare(tempDirs, bareDir, { dir: repoDir });
@@ -84,8 +84,8 @@ describe('scanAllCheckoutsStates', () => {
 		// Advance the remote from a separate clone
 		await advanceBareRepoByOneCommit(tempDirs, bareDir, 'remote-advance.txt');
 
-		writeRepoMockRecord(workspaceDir, 'RefetchTest', bareDir);
-		writeCheckoutMockRecord(workspaceDir, 'RefetchTest', 'RefetchTest', 'refetchtest');
+		writeRepoRecordFixture(workspaceDir, 'RefetchTest', bareDir);
+		writeCheckoutRecordFixture(workspaceDir, 'RefetchTest', 'RefetchTest', 'refetchtest');
 
 		// Load records and hydrate store (same as commands do)
 		const repos = await loadRepositoryRecords(ctx);

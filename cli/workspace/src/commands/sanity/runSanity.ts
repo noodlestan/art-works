@@ -27,7 +27,7 @@ export async function runSanity(
 		records as unknown as Parameters<typeof hydrateStoreFromRecords>[2],
 	);
 
-	ctx.log.log(createGenericOperation('command', ['sanity', options.auto]));
+	ctx.operations.log(createGenericOperation('command', ['sanity', options.auto]));
 
 	let workspace = await scanWorkspaceCheckout(ctx, options.refetch);
 	await scanAllCheckoutsStates(ctx, options.refetch);
@@ -54,5 +54,5 @@ export async function runSanity(
 	presentWorkspaceReport(filteredWorkspace);
 	presentCheckoutReport(ctx.config, ctx.store.getAllCheckouts());
 	presentExtraneousReport(extraneous);
-	presentOperationsReport(ctx.log);
+	presentOperationsReport(ctx.operations);
 }

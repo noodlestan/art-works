@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { makeCheckoutScanMock } from '../../test/helpers/checkout/makeCheckoutScanMock.js';
+import { makeCheckoutScanFixture } from '../../test/helpers/checkout/makeCheckoutScanFixture.js';
 import type { Checkout } from '../store/createCheckout.js';
 
 import { presentExtraneousReport } from './presentExtraneousReport.js';
@@ -14,7 +14,7 @@ function makeCheckout(overrides?: Partial<Checkout>): Checkout {
 		repo: undefined,
 		record: { name: 'orphan', location: 'orphan', branch: 'main', repository: undefined },
 		path: '/tmp/orphan',
-		scan: makeCheckoutScanMock(['no-remote']),
+		scan: makeCheckoutScanFixture(['no-remote']),
 		...overrides,
 	};
 }
